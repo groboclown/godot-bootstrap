@@ -20,8 +20,8 @@ Some of the components that bootstrap provides:
   games.
 * [Automated Testing](components/unit_tests) allows for writing tests in
   GDScript, and executing them in an automated way.
-* *Extended GUI components* GUI components to help make the UI aspects
-  work nicely together.
+* [Extended GUI controllers](components/ext_controllers) GUI controllers to help
+  make the UI aspects work nicely together.
 
 
 
