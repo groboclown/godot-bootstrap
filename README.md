@@ -18,6 +18,8 @@ Some of the components that bootstrap provides:
   retrieving user-set configuration values.
 * [Save Games](components/save_game) components for maintaining saved
   games.
+* [Automated Testing](components/unit_tests) allows for writing tests in
+  GDScript, and executing them in an automated way.
 * *Extended GUI components* GUI components to help make the UI aspects
   work nicely together.
 
@@ -29,20 +31,49 @@ Bootstrap provides a set of components to provide basic functionality to
 your game, and the tools to import those components into your game.  Bootstrap
 requires [Python 3](https://www.python.org/downloads/release) to run.
 
-(Describe setting up the bootstrap config file)
+To use bootstrap, first pull the files from Github.
 
-(Describe running the build to install the components)
+Then, you need to add a `bootstrap.config` file into your project directory,
+and configure it with a few simple steps:
 
+```
+# The bootstrap config file for the project.
+config = {
+    # the directory to copy the bootstrap files.  These need to be inside the
+	# Godot game directory (at or a sub-directory of the "engine.cfg" file),
+	# or you'll need a custom build system to move them there.
+	# If this isn't given, it defaults to "bootstrap".
+	"bootstrap": "game/boostrap",
+	
+	# All the components that the project uses.  These will be copied into the
+	# bootstrap directory.  If a component depends upon another component, those
+	# will be added implicitly (you don't need to reference it).
+	"components": [ "unit_tests", "error_codes" ],
+	
+	# If you want to map the bootstrap file categories to a different location,
+	# this gives you that flexibility.  See each component for the categories
+	# it uses, and for whether directory remapping is supported.
+	"dirmap": {
+		"lib": "src/library_files",
+		"tests": "../tests"
+	},
+	
+	# By default, the bootstrap files will be a symlink to the bootstrap
+	# directory.  To change this, set this value to False.  Note that if
+	# your operating system or file system doesn't support symlinks, then
+	# the files will just be copied regardless of this setting.
+	# Valid values are True and False (note case sensitivity)
+	"symlinks": True
+}
+```
 
+To install the files, run the downloaded bootstrap `build/run.py` file
+from the project directory:
 
-## Automated Testing
-
-Modern software is complex.  The horsepower of computers allows us to build
-games with hundreds of systems.  This also means that there's many places
-where the game can break.  To aleviate the problem of adding a whole QA team
-to find the little issues, automated tests help to make sure small parts of
-the system are working as intended.
-
+```
+$ cd my_project
+$ python3 ../../godot-bootstrap/build/run.py
+```
 
 
 ## Contributing

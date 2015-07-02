@@ -24,6 +24,8 @@ class Project:
             prj["components"] = []
         if "dirmap" not in prj:
             prj["dirmap"] = {}
+        if "symlinks" not in prj:
+            prj["symlinks"] = True
 
     @property
     def name(self):
@@ -33,6 +35,10 @@ class Project:
     def basedir(self):
         return self.__dirname
 
+    @property
+    def use_symlinks(self):
+        return self.__prj["symlinks"] == True
+        
     @property
     def bootstrap_dir(self):
         return os.path.join(self.__dirname, self.__prj["bootstrap"])
@@ -49,7 +55,7 @@ class Project:
 
 
 def _load_project_config(project_dir):
-    project_file = os.path.join(project_dir, "bootstrap.py")
+    project_file = os.path.join(project_dir, "bootstrap.config")
     with open(project_file, "r") as f:
         text = f.read() + "\n"
     prj = compile(text, project_file, "exec", dont_inherit=True)

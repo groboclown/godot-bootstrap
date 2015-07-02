@@ -116,7 +116,7 @@ def _load_components(component_base_dir, config_map, component_names):
 
 
 def _load_component_config(component_dir):
-    component_file = os.path.join(component_dir, "component.py")
+    component_file = os.path.join(component_dir, "component.config")
     with open(component_file, "r") as f:
         text = f.read() + "\n"
     component = compile(text, component_file, "exec", dont_inherit=True)

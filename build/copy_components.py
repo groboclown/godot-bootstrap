@@ -36,10 +36,10 @@ def copy_components(project_dir, bootstrap_dir):
                 if dest in generated:
                     raise Exception("two or more components write to the same place (" + dest + ")")
                 generated[dest] = True
-                _copy_struct(src, dest)
+                _copy_struct(src, dest, project.use_symlinks)
 
 
-def _copy_struct(src, dest):
+def _copy_struct(src, dest, use_symlinks):
     print(src + " -> " + dest)
 
     # Ensure the parent destination path exists
@@ -51,16 +51,21 @@ def _copy_struct(src, dest):
     if os.path.isdir(src):
         if os.path.islink(dest):
             os.remove(dest)
-        try:
-            os.symlink(src, dest, target_is_directory=True)
-            print("  --- symlink dir")
-        except (NotImplementedError, OSError):
+        success = False
+        if use_symlinks:
+            try:
+                os.symlink(src, dest, target_is_directory=True)
+                success = True
+                print("  --- symlink dir")
+            except (NotImplementedError, OSError):
+                success = False
+        if not success:
             # symlinks not supported
             # Custom recursive copy.
             for name in os.listdir(src):
                 srcname = os.path.join(src, name)
                 destname = os.path.join(dest, name)
-                _copy_struct(srcname, destname)
+                _copy_struct(srcname, destname, use_symlinks)
     else:
         if os.path.islink(src):
             os.unlink(src)
@@ -69,10 +74,15 @@ def _copy_struct(src, dest):
         elif os.path.exists(dest):
             os.unlink(src)
 
-        try:
-            os.symlink(src, dest, target_is_directory=False)
-            print("  --- symlink file")
-        except (NotImplementedError, OSError):
-            # Could not make symlink
+        success = False
+        if use_symlinks:
+            try:
+                os.symlink(src, dest, target_is_directory=False)
+                success = True
+                print("  --- symlink file")
+            except (NotImplementedError, OSError):
+                # Could not make symlink
+                success = False
+        if not success:
             shutil.copy(src, dest, follow_symlinks = True)
 
