@@ -67,12 +67,12 @@ def _copy_struct(src, dest, use_symlinks):
                 destname = os.path.join(dest, name)
                 _copy_struct(srcname, destname, use_symlinks)
     else:
-        if os.path.islink(src):
-            os.unlink(src)
+        if os.path.islink(dest):
+            os.unlink(dest)
         elif os.path.isdir(dest):
             shutil.rmtree(dest)
         elif os.path.exists(dest):
-            os.unlink(src)
+            os.unlink(dest)
 
         success = False
         if use_symlinks:
