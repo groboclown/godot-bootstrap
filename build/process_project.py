@@ -8,8 +8,18 @@ import os
 import types
 
 
-def load_project(project_dir):
-    return Project(os.path.split(project_dir)[1], project_dir, _load_project_config(project_dir))
+def load_project(project_dir, bootstrap_dir):
+    components = find_component_names(bootstrap_dir)
+    return Project(os.path.split(project_dir)[1], project_dir, _load_project_config(project_dir, components))
+    
+        
+def find_component_names(bootstrap_dir):
+    ret = []
+    for name in os.listdir(os.path.join(bootstrap_dir, "components")):
+        fname = os.path.join(bootstrap_dir, "components", name, "component.config")
+        if os.path.exists(fname):
+            ret.append(name)
+    return ret
 
 
 class Project:
@@ -47,6 +57,11 @@ class Project:
     def component_names(self):
         return self.__prj["components"]
     
+    def map_category_to_res(self, category):
+        if category in self.__prj["dirmap"]:
+            return "res://" + self.__prj["dirmap"][category] + "/"
+        return "res://" + category + "/"
+    
     def map_category_to_dir(self, category):
         if category in self.__prj["dirmap"]:
             return os.path.join(self.bootstrap_dir, self.__prj["dirmap"][category])
@@ -54,13 +69,15 @@ class Project:
 
 
 
-def _load_project_config(project_dir):
+def _load_project_config(project_dir, component_names):
     project_file = os.path.join(project_dir, "bootstrap.config")
     with open(project_file, "r") as f:
         text = f.read() + "\n"
     prj = compile(text, project_file, "exec", dont_inherit=True)
     if "config" in prj.co_names:
         prj_module = types.ModuleType(os.path.basename(project_dir), os.path.basename(project_dir))
+        for name in component_names:
+            setattr(prj_module, name, name)
         exec(prj, prj_module.__dict__)
         if "config" in dir(prj_module) and type(prj_module.config) == dict:
             return prj_module.config

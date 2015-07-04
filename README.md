@@ -48,7 +48,7 @@ config = {
 	# All the components that the project uses.  These will be copied into the
 	# bootstrap directory.  If a component depends upon another component, those
 	# will be added implicitly (you don't need to reference it).
-	"components": [ "unit_tests", "error_codes" ],
+	"components": [ unit_tests, error_codes ],
 	
 	# If you want to map the bootstrap file categories to a different location,
 	# this gives you that flexibility.  See each component for the categories
@@ -56,24 +56,22 @@ config = {
 	"dirmap": {
 		"lib": "src/library_files",
 		"tests": "../tests"
-	},
-	
-	# By default, the bootstrap files will be a symlink to the bootstrap
-	# directory.  To change this, set this value to False.  Note that if
-	# your operating system or file system doesn't support symlinks, then
-	# the files will just be copied regardless of this setting.
-	# Valid values are True and False (note case sensitivity)
-	"symlinks": True
+	}
 }
 ```
 
-To install the files, run the downloaded bootstrap `build/run.py` file
+To install the files, run the downloaded bootstrap `build/install.py` file
 from the project directory:
 
 ```
 $ cd my_project
-$ python3 ../../godot-bootstrap/build/run.py
+$ python3 (godot-bootstrap-dir)/build/install.py
 ```
+
+Note that running the install will remove files that are no longer specified
+in the components, and overwrite existing files, you shouldn't modify them
+from your installed directory.  If you want to make customizations, copy them
+to a separate location.
 
 
 ## Contributing

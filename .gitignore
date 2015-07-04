@@ -3,7 +3,9 @@
 
 # Example generated files
 examples/*/boot
-
+examples/*/tests/main.gd
+examples/*/tests/base.gd
+.bootstrap.installed-files
 
 
 # Byte-compiled / optimized / DLL files

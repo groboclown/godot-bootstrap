@@ -5,6 +5,7 @@ Godot core provides (used by other components in *Bootstrap*), as well as
 a way to get a usable error message, rather than a cryptic guru meditation
 code.
 
+**Category**: `lib`
 
 ## Usage
 

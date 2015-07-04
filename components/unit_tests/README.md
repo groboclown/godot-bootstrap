@@ -6,6 +6,7 @@ where the game can break.  To alleviate the problem of adding a whole QA team
 to find the little issues, automated tests help to make sure small parts of
 the system are working as intended.
 
+**Category** `tests`
 
 ## Writing Tests
 

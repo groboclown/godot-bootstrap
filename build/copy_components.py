@@ -11,13 +11,14 @@ import process_project
 import process_component
 
 
+
 def copy_components(project_dir, bootstrap_dir):
     """
     Copies the components from the bootstrap directory
     into the project directory.  Returns a list of all the files
     that were installed.
     """
-    project = process_project.load_project(project_dir)
+    project = process_project.load_project(project_dir, bootstrap_dir)
     components = process_component.load_components(os.path.join(bootstrap_dir, "components"), project.component_names)
 
     # Copy all the components returned, not just the requested ones.
@@ -38,59 +39,50 @@ def copy_components(project_dir, bootstrap_dir):
                 if dest in generated:
                     raise Exception("two or more components write to the same place (" + dest + ")")
                 generated[dest] = True
-                copied.update(_copy_struct(src, dest, project.use_symlinks))
+                copied.update(_copy_struct(src, dest, cat, project))
     return list(copied.keys())
 
 
-def _copy_struct(src, dest, use_symlinks):
+def _copy_struct(src, dest, category, project):
     print(src + " -> " + dest)
     ret = {}
 
     # Ensure the parent destination path exists
+    # Note that this may miss some directories that
+    # should be put into the returned list.
     parent = os.path.split(dest)[0]
     if not os.path.isdir(parent):
         os.makedirs(parent)
         ret[parent] = True
 
-    # Recursive copy using symlinks if possible
     if os.path.isdir(src):
-        if os.path.islink(dest):
-            os.remove(dest)
-        success = False
-        if use_symlinks:
-            try:
-                os.symlink(src, dest, target_is_directory=True)
-                ret[dest] = True
-                success = True
-                print("  --- symlink dir")
-            except (NotImplementedError, OSError):
-                success = False
-        if not success:
-            # symlinks not supported
-            # Custom recursive copy.
-            for name in os.listdir(src):
-                srcname = os.path.join(src, name)
-                destname = os.path.join(dest, name)
-                ret.update(_copy_struct(srcname, destname, use_symlinks))
+        # We can't use symlinks, because we may need custom copy for
+		# resource files.  We'll need a custom recursive copy.
+        for name in os.listdir(src):
+            srcname = os.path.join(src, name)
+            destname = os.path.join(dest, name)
+            ret.update(_copy_struct(srcname, destname, category, project))
     else:
-        if os.path.islink(dest):
-            os.unlink(dest)
-        elif os.path.isdir(dest):
+        if os.path.isdir(dest):
             shutil.rmtree(dest)
         elif os.path.exists(dest):
             os.unlink(dest)
 
-        success = False
-        if use_symlinks:
-            try:
-                os.symlink(src, dest, target_is_directory=False)
-                ret[dest] = True
-                success = True
-                print("  --- symlink file")
-            except (NotImplementedError, OSError):
-                # Could not make symlink
-                success = False
-        if not success:
+        ext = os.path.splitext(dest)[1]
+        if ext.startswith(".x"):
+            # XML formatted resource.
+            _remap_res(src, dest, category, project)
+        else:
             shutil.copy(src, dest, follow_symlinks = True)
-            ret[dest] = True
+        ret[dest] = True
     return ret
+
+    
+def _remap_res(src, dest, category, project):
+    in_res = '"res://' + category + '/'
+    out_res = '"' + project.map_category_to_res(category)
+    with open(src, "r") as inp:
+        with open(dest, "w") as out:
+            while line in inp.readlines():
+                out.write(line.replace(in_res, out_res))
+    
