@@ -34,7 +34,7 @@ func _ready():
 
 
 func _on_Show_Error_Dialog():
-	var error_dialog = preload("boot/error_dialog.gd").new()
+	var error_dialog = preload("boot/gui/error_dialog.gd").new()
 	error_dialog.show_warning(self, "Example Error Dialog", "BigError", "clicked", "_on_BigError")
 
 func _on_BigError():

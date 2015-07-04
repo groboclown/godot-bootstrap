@@ -3,7 +3,7 @@
 Displays an error dialog to the user.  Allows the dialog to force a quit
 if it's an unrecoverable error, or optionally additional actions.
 
-**Category**: `lib`
+**Category**: `gui`
 
 ## Usage
 
@@ -11,7 +11,7 @@ The general usage is to create a new instance, then run one of the `show_*`
 functions.
 
 ```
-var err_dialog = preload("bootstrap/error_dialog.gd").new()
+var err_dialog = preload("bootstrap/gui/error_dialog.gd").new()
 err_dialog.show_warning(self, "Horrible Error!", "There was a horrible error.", err_code)
 ```
 
