@@ -6,13 +6,13 @@ Process a project configuration file.
 
 import os
 import types
-
+from categories import CATEGORIES
 
 def load_project(project_dir, bootstrap_dir):
     components = find_component_names(bootstrap_dir)
     return Project(os.path.split(project_dir)[1], project_dir, _load_project_config(project_dir, components))
     
-        
+
 def find_component_names(bootstrap_dir):
     ret = []
     for name in os.listdir(os.path.join(bootstrap_dir, "components")):
@@ -36,6 +36,30 @@ class Project:
             prj["dirmap"] = {}
         if "symlinks" not in prj:
             prj["symlinks"] = True
+        
+        # Sets the bootstrap path as a "res://" directory.  It will include
+        # a trailing "/" character.
+        bdir = os.path.abspath(self.bootstrap_dir)
+        path = []
+        while True:
+            # Find the engine.cfg up the directory path
+            fname = os.path.join(bdir, "engine.cfg")
+            if os.path.isfile(fname):
+                # found engine directory
+                ret = "res://"
+                path.reverse()
+                for p in path:
+                    ret += p + "/"
+                self.__bootstrap_res = ret
+                break
+            parts = os.path.split(bdir)
+            newdir = parts[0]
+            if newdir == bdir or newdir == "" or newdir is None:
+                # root
+                raise Exception("Could not find engine directory under bootstrap directory " + self.bootstrap_dir)
+            bdir = newdir
+            path.append(parts[1])
+        
 
     @property
     def name(self):
@@ -58,9 +82,11 @@ class Project:
         return self.__prj["components"]
     
     def map_category_to_res(self, category):
+        base = self.__bootstrap_res
         if category in self.__prj["dirmap"]:
-            return "res://" + self.__prj["dirmap"][category] + "/"
-        return "res://" + category + "/"
+            return base + self.__prj["dirmap"][category] + "/"
+        return base + category + "/"
+        
     
     def map_category_to_dir(self, category):
         if category in self.__prj["dirmap"]:
@@ -78,6 +104,8 @@ def _load_project_config(project_dir, component_names):
         prj_module = types.ModuleType(os.path.basename(project_dir), os.path.basename(project_dir))
         for name in component_names:
             setattr(prj_module, name, name)
+        for cat in CATEGORIES:
+            setattr(prj_module, cat, cat)
         exec(prj, prj_module.__dict__)
         if "config" in dir(prj_module) and type(prj_module.config) == dict:
             return prj_module.config

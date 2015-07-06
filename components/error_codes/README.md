@@ -13,7 +13,7 @@ code.
 it as a top-level variable in your GDScript file:
 
 ```
-var ERROR_CODE = preload(".../error_codes.gd")
+var ERROR_CODES = preload("res://bootstrap/lib/error_codes.gd")
 ```
 
 Then, in your code, you can translate the error codes into messages like:
@@ -21,7 +21,7 @@ Then, in your code, you can translate the error codes into messages like:
 ```
 var err = file.open(filename, File.READ)
 if err != OK:
-  error_label.set_text(tr("ERROR_FOUND_MESSAGE") + tr(ERROR_CODE.to_string(err)))
+  error_label.set_text(tr("ERROR_FOUND_MESSAGE") + tr(ERROR_CODES.to_string(err)))
   return
 ```
 
@@ -31,14 +31,20 @@ translation into human-readable text possible by adding the error code into
 the translation file.
 
 
-## Extending
+## API
 
-If you have custom error codes with their own messages, the CODES dictionary
-can be extended to include these new error codes and their message.
+### static func `add_code(int::value, string::text)`
+
+If you have custom error codes with their own messages, you can add them into
+the internal dictionary by invoking this method.
 
 ```
-ERROR_CODE[ERR_CUSTOM_VALUE] = "ERR_CUSTOM_VALUE"
+ERROR_CODES.add_code(ERR_CUSTOM_VALUE, "ERR_CUSTOM_VALUE")
 ```
 
 
+### static func `to_string(int::value) : String`
+
+Returns the internal string mapping for the error code.  By default, this is
+the GDScript constant name as a string.
 

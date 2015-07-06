@@ -6,6 +6,7 @@ var _results = {}
 var _current = null
 var _error_count = 0
 var _tests = []
+var filename = "<unknown>"
 
 func class_setup():
 	pass
@@ -42,12 +43,12 @@ func add_all(all_tests):
 func check_true(text, bool_val):
 	if ! bool_val:
 		_current["errors"].append(text)
-		printerr(_current["name"] + ": " + text)
+		print(_current["name"] + ": " + text)
 		print_stack()
 	return (! bool_val) == false
 
 func check_that(text, actual, matcher):
-	return assert_true(text + ": " + matcher.describe(actual), matcher.matches(actual))
+	return check_true(text + ": " + matcher.describe(actual), matcher.matches(actual))
 	
 
 	
@@ -74,7 +75,7 @@ func run():
 
 
 func run_test(name):
-	print("Running " + name)
+	print("Running " + filename + "." + name)
 	_current = { "name": name, "errors": [] }
 	setup()
 	call(name)
@@ -82,7 +83,7 @@ func run_test(name):
 	_results[name] = _current
 	if _current["errors"].size() > 0:
 		_error_count += _current["errors"].size()
-		printerr(name + " failed")
+		print(filename + "." + name + " failed")
 
 # -------------------------------------------------------------------------
 

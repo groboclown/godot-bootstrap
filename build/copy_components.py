@@ -9,7 +9,7 @@ import os
 import shutil
 import process_project
 import process_component
-
+from categories import CATEGORIES
 
 
 def copy_components(project_dir, bootstrap_dir):
@@ -25,6 +25,9 @@ def copy_components(project_dir, bootstrap_dir):
     to_copy = {}
     for component in components:
         for cat in component.provides_categories:
+            if cat not in CATEGORIES:
+                print("*** Found un-registered category " + cat)
+                CATEGORIES.append(cat)
             if cat not in to_copy:
                 to_copy[cat] = []
             to_copy[cat].append(component.provides(cat, components))
@@ -39,12 +42,12 @@ def copy_components(project_dir, bootstrap_dir):
                 if dest in generated:
                     raise Exception("two or more components write to the same place (" + dest + ")")
                 generated[dest] = True
-                copied.update(_copy_struct(src, dest, cat, project))
+                copied.update(_copy_struct(src, dest, project))
     return list(copied.keys())
 
 
-def _copy_struct(src, dest, category, project):
-    print(src + " -> " + dest)
+def _copy_struct(src, dest, project):
+    #print(src + " -> " + dest)
     ret = {}
 
     # Ensure the parent destination path exists
@@ -57,11 +60,11 @@ def _copy_struct(src, dest, category, project):
 
     if os.path.isdir(src):
         # We can't use symlinks, because we may need custom copy for
-		# resource files.  We'll need a custom recursive copy.
+        # resource files.  We'll need a custom recursive copy.
         for name in os.listdir(src):
             srcname = os.path.join(src, name)
             destname = os.path.join(dest, name)
-            ret.update(_copy_struct(srcname, destname, category, project))
+            ret.update(_copy_struct(srcname, destname, project))
     else:
         if os.path.isdir(dest):
             shutil.rmtree(dest)
@@ -69,20 +72,22 @@ def _copy_struct(src, dest, category, project):
             os.unlink(dest)
 
         ext = os.path.splitext(dest)[1]
-        if ext.startswith(".x"):
-            # XML formatted resource.
-            _remap_res(src, dest, category, project)
+        if ext.startswith(".x") or ext == ".gd":
+            # XML formatted resource and GDScript files
+            _remap_res(src, dest, project)
         else:
             shutil.copy(src, dest, follow_symlinks = True)
         ret[dest] = True
     return ret
 
-    
-def _remap_res(src, dest, category, project):
-    in_res = '"res://' + category + '/'
-    out_res = '"' + project.map_category_to_res(category)
+
+def _remap_res(src, dest, project):
     with open(src, "r") as inp:
         with open(dest, "w") as out:
-            while line in inp.readlines():
-                out.write(line.replace(in_res, out_res))
+            for line in inp.readlines():
+                for cat in CATEGORIES:
+                    in_res = '"res://bootstrap/' + cat + '/'
+                    out_res = '"' + project.map_category_to_res(cat)
+                    line = line.replace(in_res, out_res)
+                out.write(line)
     

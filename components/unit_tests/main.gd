@@ -12,6 +12,7 @@ func _init():
 	
 
 func find_tests_from_dir(path):
+	#print("Finding in " + path)
 	var ret = []
 	var dir = Directory.new()
 	dir.open(path)
@@ -19,9 +20,17 @@ func find_tests_from_dir(path):
 	var file_name = dir.get_next()
 	while file_name != "":
 		var name = path + file_name
-		var f = File.new()
-		if f.file_exists(name) and file_name != "base.gd":
-			ret.append(name)
+		if dir.current_is_dir():
+			#print("Checking dir " + file_name + " [" +  file_name.right(file_name.length() - 6)+ "]")
+			if file_name.right(file_name.length() - 6) == "_tests":
+				for f in find_tests_from_dir(name + "/"):
+					ret.append(f)
+		else:
+			var f = File.new()
+			#print("Checking file " + name)
+			if name.right(name.length() - 3) == ".gd" && f.file_exists(name):
+				#print("added " + name)
+				ret.append(name)
 		file_name = dir.get_next()
 	dir.list_dir_end()
 	return ret
@@ -34,9 +43,11 @@ func run_tests(tests):
 			run_test(test, test_instance)
 
 
-		
+
 func run_test(test_file, test_instance):
 	print("Running " + test_file)
+	test_instance.filename = test_file.get_file()
+	test_instance.filename = test_instance.filename.left(test_instance.filename.length() - 3)
 	test_instance.run()
 
 

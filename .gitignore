@@ -5,6 +5,7 @@
 examples/*/boot
 examples/*/tests/main.gd
 examples/*/tests/base.gd
+examples/*/tests/bootstrap_tests
 .bootstrap.installed-files
 
 

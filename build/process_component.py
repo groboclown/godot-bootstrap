@@ -7,6 +7,7 @@ Processes a component directory.
 
 import os
 import types
+from categories import CATEGORIES
 
 def load_components(component_dir, component_names):
     """Return a list of Component objects that fulfil the component
@@ -15,6 +16,7 @@ def load_components(component_dir, component_names):
     _load_components(component_dir, configs, component_names)
     return configs.values()
 
+KEYWORDS = [ "requires", "optional", "provides" ]
 
 class Component:
     def __init__(self, name, basedir, config):
@@ -122,6 +124,10 @@ def _load_component_config(component_dir):
     component = compile(text, component_file, "exec", dont_inherit=True)
     if "config" in component.co_names:
         component_module = types.ModuleType(os.path.basename(component_dir), os.path.basename(component_dir))
+        for cat in CATEGORIES:
+            setattr(component_module, cat, cat)
+        for key in KEYWORDS:
+            setattr(component_module, key, key)
         exec(component, component_module.__dict__)
         if "config" in dir(component_module) and type(component_module.config) == dict:
             return component_module.config

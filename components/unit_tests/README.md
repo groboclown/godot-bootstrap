@@ -12,9 +12,12 @@ the system are working as intended.
 
 First, create a new test file.  The tests are expected to live in your Godot
 game folder, under the `tests` sub-directory - that's where the main test
-runner searches for the test files.
+runner searches for the test files.  It's usually a good idea to remap the
+`tests` category in your project file to the `tests` directory in the game
+folder to make test development and execution easier.
 
-The test file needs to extend the `unit_tests/base.gd` file.  Because
+The test file needs to be named with a `test_` prefix, and it needs to extend
+the `unit_tests/base.gd` file.  Because
 Godot doesn't have an API to inspect the names of the methods in a script,
 you need to initialize the list of test names in the `_init()` function.
 Finally, you need to write the test functions themselves.
@@ -47,8 +50,9 @@ func test_type_array():
 		is_not(TYPE_ARRAY))
 ```
 
-Right now, the test runner will not recursively check for test files under
-sub-directories in the `tests` directory.  That may change in the future.
+The test runner will recursively check for test files under
+sub-directories in the `tests` directory, for any sub-directory whose
+name ends with `_tests`.
 
 
 
@@ -69,7 +73,7 @@ Your path will change depending on where you install the test scripts.
 Because all tests extend the `base.gd` file, they inherit the assertion
 framework.  Currently, there are only two "assertion" methods.
 
-### func `check_true(message, boolean_value)` :: boolean
+### func `check_true(String::message, boolean::value)` : boolean
 
 If the `boolean_value` is false, (checked with `! boolean_value`), an error
 is reported.  Because Godot doesn't have strong exception mechanisms, this will
@@ -83,7 +87,7 @@ if ! check_true("Zero is really zero", 0 == 0):
 	print("Zero is not really zero?")
 ```
 
-### func `check_that(message, actual_value, matcher)` :: boolean
+### func `check_that(String::message, Variant::actual_value, Matcher::matcher)` : boolean
 
 Uses the "matcher" (see below) object to check whether the `actual_value`
 is an expected value.  Its return value and usage is like the `check_true`
@@ -110,7 +114,7 @@ class IsNullMatcher:
 
 Each built-in matcher includes a function to easily create the instance.
 
-### func `is(expected_value)` :: Matcher
+### func `is(Variant::expected_value)` : Matcher
 
 Returns an `IsMatcher` instance that checks whether the actual value matches
 the expected value.
@@ -120,7 +124,7 @@ check_that("should match", obj.get_value(), is(1))
 ```
 
 
-### func `is_not(expected_value)` :: Matcher
+### func `is_not(Variant::expected_value)` : Matcher
 
 Returns a `NotMatcher` instance that checks whether the actual value does not
 match the expected value.  The expected value may also be another matcher, to
@@ -133,7 +137,7 @@ check_that("should not be between values",\
 ```
 
 
-### func `between(lo, hi)` :: Matcher
+### func `between(float::lo, float::hi)` : Matcher
 
 Returns a `BetweenMatcher` instance that checks whether the actual value is
 between (inclusive) the given hi and lo values.  The values are expected to
@@ -143,7 +147,7 @@ be float values, and they are checked with a `>=` and `<=` value.
 check_that("random float values are between 0 and 1", randf(), between(0,1))
 ```
 
-### func `near(value, epsilon=0.00001)` :: Matcher
+### func `near(float::value, epsilon=0.00001)` : Matcher
 
 Returns a `NearMatcher` instance that checks whether the actual value is
 within the given epsilon value to the expected value.

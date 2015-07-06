@@ -36,10 +36,14 @@ on the extension).  `xscn` instead of `scn`, `xthm` instead of `thm`, etc.
 If you're using the XML formatted resource files, you must take care to
 careful when specifying the resource paths encoded in the files.  Because
 projects can remap where the bootstrap files end up, they need to conform
-to the standard of `res://(category)/(rest of path)`.  The install.py file
-will remap all the files with the `.x` extension prefix.
+to the standard of `res://bootstrap/(category)/(rest of path)`.  The install.py
+file will remap all the files with the `.x` extension prefix
+(e.g. `.xthm`, `.xscn`) and `.gd` files.
 
 GDScript files should use relative paths instead of absolute `res` paths.
+However, there are some cases where one component needs a resource from another
+category, in which case using the above standard is the only means available.
+Make sure the resource string is encased in double quotes (`"`).
 
 
 ## GDScript Code Style
