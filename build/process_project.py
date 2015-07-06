@@ -8,6 +8,12 @@ import os
 import types
 from categories import CATEGORIES
 
+TOP_KEYWORDS = [
+    "bootstrap",
+    "components",
+    "dirmap"
+]
+
 def load_project(project_dir, bootstrap_dir):
     components = find_component_names(bootstrap_dir)
     return Project(os.path.split(project_dir)[1], project_dir, _load_project_config(project_dir, components))
@@ -34,8 +40,6 @@ class Project:
             prj["components"] = []
         if "dirmap" not in prj:
             prj["dirmap"] = {}
-        if "symlinks" not in prj:
-            prj["symlinks"] = True
         
         # Sets the bootstrap path as a "res://" directory.  It will include
         # a trailing "/" character.
@@ -68,10 +72,6 @@ class Project:
     @property
     def basedir(self):
         return self.__dirname
-
-    @property
-    def use_symlinks(self):
-        return self.__prj["symlinks"] == True
         
     @property
     def bootstrap_dir(self):
@@ -106,6 +106,8 @@ def _load_project_config(project_dir, component_names):
             setattr(prj_module, name, name)
         for cat in CATEGORIES:
             setattr(prj_module, cat, cat)
+        for key in TOP_KEYWORDS:
+            setattr(prj_module, key, key)
         exec(prj, prj_module.__dict__)
         if "config" in dir(prj_module) and type(prj_module.config) == dict:
             return prj_module.config

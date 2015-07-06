@@ -12,15 +12,15 @@ to ignore.
 
 Some of the components that bootstrap provides:
 
-* [Modules](components/modules) a system for allowing user mods, or
+* [Modules](`components/modules`) a system for allowing user mods, or
   developer-provided DLC, to extend the basic game.
-* [User Configuration](components/user_config) tools for storing and
+* [User Configuration](`components/user_config`) tools for storing and
   retrieving user-set configuration values.
-* [Save Games](components/save_game) components for maintaining saved
+* [Save Games](`components/save_game`) components for maintaining saved
   games.
-* [Automated Testing](components/unit_tests) allows for writing tests in
+* [Automated Testing](`components/unit_tests`) allows for writing tests in
   GDScript, and executing them in an automated way.
-* [Extended GUI controllers](components/ext_controllers) GUI controllers to help
+* [Extended GUI controllers](`components/ext_controllers`) GUI controllers to help
   make the UI aspects work nicely together.
 
 
@@ -43,17 +43,17 @@ config = {
 	# Godot game directory (at or a sub-directory of the "engine.cfg" file),
 	# or you'll need a custom build system to move them there.
 	# If this isn't given, it defaults to "bootstrap".
-	"bootstrap": "game/boostrap",
+	bootstrap: "game/boostrap",
 	
 	# All the components that the project uses.  These will be copied into the
 	# bootstrap directory.  If a component depends upon another component, those
 	# will be added implicitly (you don't need to reference it).
-	"components": [ unit_tests, error_codes ],
+	components: [ unit_tests, error_codes ],
 	
 	# If you want to map the bootstrap file categories to a different location,
 	# this gives you that flexibility.  See each component for the categories
 	# it uses, and for whether directory remapping is supported.
-	"dirmap": {
+	dirmap: {
 		"lib": "src/library_files",
 		"tests": "../tests"
 	}
