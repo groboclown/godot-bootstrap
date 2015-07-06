@@ -166,7 +166,6 @@ func recalculate():
 				pw -= max(k.get_size().x, 10)
 			if pw < widget_width:
 				widget_width = pw
-	print("width: " + str(widget_width))
 	
 	var start_x = 0
 	var fnt = get_text_font()
