@@ -67,9 +67,7 @@ func _on_resized():
 func _draw():
 	if _changed:
 		recalculate()
-	var fnt = font
-	if fnt == null:
-		fnt = get_font("font", "Label")
+	var fnt = get_text_font()
 	var c = color
 	if c == null:
 		c = get_color("font_color", "Label")
@@ -146,7 +144,7 @@ func text_changed(newval):
 			_trtext.append(txt)
 
 
-func get_font():
+func get_text_font():
 	if font == null:
 		return get_font("font", "Label")
 	return font
@@ -156,7 +154,7 @@ func recalculate():
 	_changed = false
 	
 	var widget_width = _actual_width
-	if widget_width == null:
+	if widget_width == null || widget_width <= 0:
 		if _minimum_width == null:
 			_minimum_width = get_minimum_size().x
 		widget_width = max(get_size().x, _minimum_width)
@@ -168,9 +166,10 @@ func recalculate():
 				pw -= max(k.get_size().x, 10)
 			if pw < widget_width:
 				widget_width = pw
+	print("width: " + str(widget_width))
 	
 	var start_x = 0
-	var fnt = get_font()
+	var fnt = get_text_font()
 	var font_height = float(fnt.get_height())
 	var psep = int(paragraph_separation * font_height)
 	var lsep = int(line_height * font_height)
