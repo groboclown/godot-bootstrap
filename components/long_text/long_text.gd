@@ -156,6 +156,10 @@ func recalculate():
 	_changed = false
 	
 	var widget_width = _actual_width
+	if widget_width == null:
+		if _minimum_width == null:
+			_minimum_width = get_minimum_size().x
+		widget_width = max(get_size().x, _minimum_width)
 	if get_parent() != null && get_parent() extends ScrollContainer:
 		var pw = get_parent().get_size().x
 		if pw > 0:
