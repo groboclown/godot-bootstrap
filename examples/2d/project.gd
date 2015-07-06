@@ -41,7 +41,7 @@ func _on_BigError():
 	print("BigError cleanup")
 
 func _on_BigText_display():
-	get_node("BigText/text").set_text("Take a seat and have a drink.  I'm going to tell you a story\nOnce there was a girl.\nShe lived in a castle.\nThe was eaten by a really large werewolf, but she survived in its belly.  It was really warm in there.  She made it into a cozy home.\nShe then wrote a game using Godot, and it became wildly popular.  Unfortunately, she was trapped inside the belly of a werewolf, and didn't know what people thought of it.\nThen she escaped and became queen of the world.\nThe end.")
+	get_node("BigText/s/text").text = "Take a seat and have a drink.  I'm going to tell you a story.\nOnce there was a girl.\nShe lived in a castle.\nThe was eaten by a really large werewolf, but she survived in its belly.  It was really warm in there.  She made it into a cozy home.  Fortunately she was able to get wi-fi and cable, but the public cooperative radio station never came in quite right.\nShe then wrote a game using Godot, and it became wildly popular.  Unfortunately, she was trapped inside the belly of a werewolf, and didn't know what people thought of it.\nThen she typed the magic word, \"ThisIsAReallyLongLineThatShouldNeverBeBrokenButWillBeBecauseItIsTooLongForAnythingToDisplayCorrectly.\"\nThen she escaped and became queen of the world.\nThe end."
 	get_node("BigText").show()
 
 func _on_SideBySide_display():
