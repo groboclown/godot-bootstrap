@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resource_file type="Theme" subresource_count="2" version="1.1" version_name="Godot Engine v1.1.stable.d3b42e41b0">
-	<ext_resource path="res://boot/theme/title_button_theme.gd" type="Script"></ext_resource>
+	<ext_resource path="res://boot/themes/title_button_theme.gd" type="Script"></ext_resource>
 	<main_resource>
 		<string name="resource/name"> "Menu" </string>
-		<resource name="default_font"></resource>		<resource name="script/script" resource_type="Script" path="res://boot/theme/title_button_theme.gd">  </resource>
+		<resource name="default_font"></resource>		<resource name="script/script" resource_type="Script" path="res://boot/themes/title_button_theme.gd">  </resource>
 
 	</main_resource>
 </resource_file>
