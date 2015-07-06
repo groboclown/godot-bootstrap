@@ -54,8 +54,8 @@ config = {
 	# this gives you that flexibility.  See each component for the categories
 	# it uses, and for whether directory remapping is supported.
 	dirmap: {
-		"lib": "src/library_files",
-		"tests": "../tests"
+		lib: "src/library_files",
+		tests: "../tests"
 	}
 }
 ```
