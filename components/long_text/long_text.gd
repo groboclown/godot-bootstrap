@@ -160,12 +160,10 @@ func recalculate():
 		var on_space = false
 		var x_pos = indent_pixels + start_x
 		var width = indent_pixels
-		print("line start: 0")
 		for tpos in range(0, tlen + 1):
 			var ch = txt.ord_at(tpos)
 			if ch == CH_SPACE:
 				if not on_space:
-					print("word end: " + str(tpos))
 					on_space = true
 					wordend_pos = tpos
 					wordstart_pos = -1
@@ -173,9 +171,7 @@ func recalculate():
 			else:
 				if linestart_pos < 0:
 					linestart_pos = tpos
-					print("line start: " + str(tpos))
 				if wordstart_pos < 0:
-					print("word start: " + str(tpos))
 					wordstart_pos = tpos
 					word_width = 0
 				on_space = false
@@ -188,7 +184,6 @@ func recalculate():
 			if tpos >= tlen:
 				# end of the line; stick everything into the end.
 				# We trim the text, so the last character is non-whitespace.
-				print("--eol[" + txt.right(linestart_pos) + "] " + str(width) + "/" + str(widget_width))
 				_line_pos.append([
 					# text
 					txt.right(linestart_pos),
@@ -208,7 +203,6 @@ func recalculate():
 						# No word in the line.  Just skip it
 						width = 0
 						x_pos = start_x
-						print("skipped line")
 						continue
 					# only one word; cut this one at the break.
 					# TODO add a hyphen
@@ -216,9 +210,6 @@ func recalculate():
 					next_linestart = tpos
 					next_wordstart = tpos
 					word_width = 0
-					print("word end: " + str(tpos))
-				
-				print("--sle[" + txt.substr(linestart_pos, wordend_pos - linestart_pos) + "] " + str(width) + "/" + str(widget_width))
 				
 				# soft end of line
 				_line_pos.append([
@@ -237,9 +228,6 @@ func recalculate():
 				wordstart_pos = next_wordstart
 				wordend_pos = -1
 				linestart_pos = next_linestart
-				print("line start: " + str(linestart_pos))
-				print("word start: " + str(wordstart_pos))
-				print("word end: -1")
 	set_custom_minimum_size(Vector2(widget_width, y_pos))
 	
 
