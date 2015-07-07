@@ -12,15 +12,15 @@ to ignore.
 
 Some of the components that bootstrap provides:
 
-* [Modules](`components/modules`) a system for allowing user mods, or
+* [Modules](components/modules) a system for allowing user mods, or
   developer-provided DLC, to extend the basic game.
-* [User Configuration](`components/user_config`) tools for storing and
+* [User Configuration](components/user_config) tools for storing and
   retrieving user-set configuration values.
-* [Save Games](`components/save_game`) components for maintaining saved
+* [Save Games](components/save_game) components for maintaining saved
   games.
-* [Automated Testing](`components/unit_tests`) allows for writing tests in
+* [Automated Testing](components/unit_tests) allows for writing tests in
   GDScript, and executing them in an automated way.
-* [Extended GUI controllers](`components/ext_controllers`) GUI controllers to help
+* [Extended GUI controllers](components/ext_controllers) GUI controllers to help
   make the UI aspects work nicely together.
 
 
