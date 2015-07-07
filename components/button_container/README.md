@@ -4,6 +4,8 @@ List of menu buttons, which includes the ability to add any UI object
 as a component, and sub-menus.  The buttons are added at run-time,
 so that items can be added or removed depending on the program state.
 
+![example](button_container.png)
+
 **Category**: `gui`
 
 
