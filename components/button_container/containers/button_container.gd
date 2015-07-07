@@ -52,9 +52,9 @@ func _init():
 func _ready():
 	# Called when children added to the tree, and this was added to the tree.
 	connect("focus_enter", self, "_on_focus_enter")
-	var button_list = get_node("button_list")
-	if button_list != null:
-		remove_child(button_list)
+	var button_list
+	if has_node("button_list"):
+		remove_child(get_node("button_list"))
 	if horizontal_buttons:
 		button_list = HBoxContainer.new()
 		button_list.set_anchor_and_margin(MARGIN_BOTTOM, ANCHOR_END, 0)

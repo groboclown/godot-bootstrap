@@ -81,7 +81,7 @@ class Component:
                     files[name + "/" + kid] = os.path.join(d, kid)
             else:
                 files[name] = d
-
+        
         return files
 
 

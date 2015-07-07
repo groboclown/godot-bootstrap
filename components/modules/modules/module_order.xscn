@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resource_file type="PackedScene" subresource_count="4" version="1.1" version_name="Godot Engine v1.1.stable.d3b42e41b0">
+	<ext_resource path="res://bootstrap/gui/modules/module_order/module_order.gd" type="Script"></ext_resource>
+	<ext_resource path="res://bootstrap/gui/containers/left_right_container.gd" type="Script"></ext_resource>
+	<ext_resource path="res://bootstrap/gui/containers/ok_cancel_swapper.gd" type="Script"></ext_resource>
+	<main_resource>
+		<dictionary name="_bundled" shared="false">
+			<string> "conn_count" </string>
+			<int> 5 </int>
+			<string> "conns" </string>
+			<int_array  len="30"> 				8, 0, 69, 68, 2, 0, 9, 0, 69, 70, 2, 0, 12, 0, 69, 71, 2, 0, 15, 0, 69, 72, 2, 0, 16, 0, 69, 73, 2, 0 </int_array>
+			<string> "names" </string>
+			<string_array  len="74">
+				<string> "Panel" </string>
+				<string> "_import_path" </string>
+				<string> "visibility/visible" </string>
+				<string> "visibility/opacity" </string>
+				<string> "visibility/self_opacity" </string>
+				<string> "visibility/light_mask" </string>
+				<string> "anchor/right" </string>
+				<string> "anchor/bottom" </string>
+				<string> "focus_neighbour/left" </string>
+				<string> "focus_neighbour/top" </string>
+				<string> "focus_neighbour/right" </string>
+				<string> "focus_neighbour/bottom" </string>
+				<string> "focus/ignore_mouse" </string>
+				<string> "focus/stop_mouse" </string>
+				<string> "size_flags/horizontal" </string>
+				<string> "size_flags/vertical" </string>
+				<string> "size_flags/stretch_ratio" </string>
+				<string> "script/script" </string>
+				<string> "__meta__" </string>
+				<string> "p" </string>
+				<string> "margin/left" </string>
+				<string> "margin/top" </string>
+				<string> "margin/right" </string>
+				<string> "margin/bottom" </string>
+				<string> "v" </string>
+				<string> "VBoxContainer" </string>
+				<string> "Label" </string>
+				<string> "range/min" </string>
+				<string> "range/max" </string>
+				<string> "range/step" </string>
+				<string> "range/page" </string>
+				<string> "range/value" </string>
+				<string> "range/exp_edit" </string>
+				<string> "rounded_values" </string>
+				<string> "text" </string>
+				<string> "align" </string>
+				<string> "valign" </string>
+				<string> "autowrap" </string>
+				<string> "uppercase" </string>
+				<string> "percent_visible" </string>
+				<string> "h" </string>
+				<string> "Container" </string>
+				<string> "rect/min_size" </string>
+				<string> "s" </string>
+				<string> "ScrollContainer" </string>
+				<string> "scroll/horizontal" </string>
+				<string> "scroll/vertical" </string>
+				<string> "up" </string>
+				<string> "Button" </string>
+				<string> "disabled" </string>
+				<string> "toggle_mode" </string>
+				<string> "is_pressed" </string>
+				<string> "click_on_press" </string>
+				<string> "icon" </string>
+				<string> "flat" </string>
+				<string> "clip_text" </string>
+				<string> "down" </string>
+				<string> "o" </string>
+				<string> "anchor/top" </string>
+				<string> "HBoxContainer" </string>
+				<string> "custom_constants/separation" </string>
+				<string> "Refresh" </string>
+				<string> "RefreshProgress" </string>
+				<string> "ProgressBar" </string>
+				<string> "percent/visible" </string>
+				<string> "separation" </string>
+				<string> "OK" </string>
+				<string> "Cancel" </string>
+				<string> "_on_up_pressed" </string>
+				<string> "pressed" </string>
+				<string> "_on_down_pressed" </string>
+				<string> "_on_Refresh_pressed" </string>
+				<string> "_on_OK_pressed" </string>
+				<string> "_on_Cancel_pressed" </string>
+			</string_array>
+			<string> "node_count" </string>
+			<int> 17 </int>
+			<string> "nodes" </string>
+			<int_array  len="849"> 				-1, -1, 0, 0, -1, 18, 1, 0, 2, 1, 3, 2, 4, 3, 5, 4, 6, 4, 7, 4, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 17, 7, 18, 8, 0, 0, 0, 0, 19, -1, 20, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 6, 4, 7, 4, 20, 9, 21, 10, 22, 9, 23, 10, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 0, 1, 0, 25, 24, -1, 20, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 6, 4, 7, 4, 20, 9, 21, 10, 22, 9, 23, 11, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 5, 14, 6, 15, 6, 16, 2, 0, 2, 0, 26, 26, -1, 28, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 22, 12, 23, 13, 8, 0, 9, 0, 10, 0, 11, 0, 12, 1, 13, 1, 14, 6, 16, 2, 27, 14, 28, 2, 29, 2, 30, 2, 31, 14, 32, 5, 33, 5, 34, 15, 35, 16, 36, 16, 37, 5, 38, 5, 39, 17, 0, 2, 0, 41, 40, -1, 19, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 21, 18, 22, 12, 23, 19, 42, 20, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 5, 14, 6, 15, 6, 16, 2, 17, 21, 0, 4, 0, 44, 43, -1, 19, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 6, 4, 7, 4, 42, 22, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 45, 1, 46, 1, 0, 5, 0, 25, 24, -1, 14, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 5, 14, 6, 15, 6, 16, 2, 0, 4, 0, 25, 25, -1, 17, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 20, 23, 22, 24, 23, 25, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 5, 14, 6, 15, 6, 16, 2, 0, 7, 0, 48, 47, -1, 25, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 22, 26, 23, 24, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 49, 5, 50, 5, 51, 5, 52, 5, 34, 27, 53, 28, 54, 5, 55, 5, 35, 4, 0, 7, 0, 48, 56, -1, 26, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 21, 29, 22, 26, 23, 25, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 49, 5, 50, 5, 51, 5, 52, 5, 34, 30, 53, 28, 54, 5, 55, 5, 35, 4, 0, 1, 0, 25, 57, -1, 21, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 58, 4, 6, 4, 7, 4, 20, 31, 21, 9, 22, 31, 23, 31, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 5, 14, 6, 15, 6, 16, 2, 0, 10, 0, 59, 40, -1, 17, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 22, 32, 23, 24, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 5, 14, 6, 15, 6, 16, 2, 60, 33, 0, 11, 0, 48, 61, -1, 25, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 22, 34, 23, 24, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 49, 5, 50, 5, 51, 5, 52, 5, 34, 35, 53, 28, 54, 5, 55, 5, 35, 16, 0, 11, 0, 63, 62, -1, 26, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 20, 36, 21, 37, 22, 38, 23, 39, 42, 40, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 16, 2, 27, 14, 28, 9, 29, 2, 30, 14, 31, 2, 32, 5, 33, 5, 64, 5, 0, 10, 0, 41, 41, -1, 20, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 21, 29, 22, 32, 23, 29, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 17, 41, 18, 42, 65, 43, 0, 14, 0, 48, 66, -1, 25, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 22, 44, 23, 24, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 49, 5, 50, 5, 51, 5, 52, 5, 34, 45, 53, 28, 54, 5, 55, 5, 35, 4, 0, 14, 0, 48, 67, -1, 25, 1, 0, 2, 1, 3, 2, 4, 2, 5, 4, 22, 44, 23, 24, 8, 0, 9, 0, 10, 0, 11, 0, 12, 5, 13, 1, 14, 6, 15, 6, 16, 2, 49, 5, 50, 5, 51, 5, 52, 5, 34, 46, 53, 28, 54, 5, 55, 5, 35, 4, 0 </int_array>
+			<string> "variants" </string>
+			<array  len="47" shared="false">
+				<node_path> "" </node_path>
+				<bool> True </bool>
+				<real> 1 </real>
+				<real> 0.75 </real>
+				<int> 1 </int>
+				<bool> False </bool>
+				<int> 2 </int>
+				<resource  resource_type="Script" path="res://bootstrap/gui/modules/module_order/module_order.gd">  </resource>
+				<dictionary  shared="false">
+					<string> "__editor_plugin_screen__" </string>
+					<string> "2D" </string>
+					<string> "__editor_plugin_states__" </string>
+					<dictionary  shared="false">
+						<string> "2D" </string>
+						<dictionary  shared="false">
+							<string> "ofs" </string>
+							<vector2> -162.033, -137.252 </vector2>
+							<string> "snap_grid" </string>
+							<bool> False </bool>
+							<string> "snap_offset" </string>
+							<vector2> 0, 0 </vector2>
+							<string> "snap_pixel" </string>
+							<bool> False </bool>
+							<string> "snap_relative" </string>
+							<bool> False </bool>
+							<string> "snap_rotation" </string>
+							<bool> False </bool>
+							<string> "snap_rotation_offset" </string>
+							<real> 0 </real>
+							<string> "snap_rotation_step" </string>
+							<real> 0.261799 </real>
+							<string> "snap_show_grid" </string>
+							<bool> False </bool>
+							<string> "snap_step" </string>
+							<vector2> 10, 10 </vector2>
+							<string> "zoom" </string>
+							<real> 0.440127 </real>
+						</dictionary>
+						<string> "3D" </string>
+						<dictionary  shared="false">
+							<string> "ambient_light_color" </string>
+							<color> 0.15, 0.15, 0.15, 1 </color>
+							<string> "default_light" </string>
+							<bool> True </bool>
+							<string> "default_srgb" </string>
+							<bool> False </bool>
+							<string> "deflight_rot_x" </string>
+							<real> 0.942478 </real>
+							<string> "deflight_rot_y" </string>
+							<real> 0.628319 </real>
+							<string> "fov" </string>
+							<real> 45 </real>
+							<string> "show_grid" </string>
+							<bool> True </bool>
+							<string> "show_origin" </string>
+							<bool> True </bool>
+							<string> "viewport_mode" </string>
+							<int> 1 </int>
+							<string> "viewports" </string>
+							<array  len="4" shared="false">
+								<dictionary  shared="false">
+									<string> "distance" </string>
+									<real> 4 </real>
+									<string> "listener" </string>
+									<bool> True </bool>
+									<string> "pos" </string>
+									<vector3> 0, 0, 0 </vector3>
+									<string> "use_environment" </string>
+									<bool> False </bool>
+									<string> "use_orthogonal" </string>
+									<bool> False </bool>
+									<string> "x_rot" </string>
+									<real> 0 </real>
+									<string> "y_rot" </string>
+									<real> 0 </real>
+								</dictionary>
+								<dictionary  shared="false">
+									<string> "distance" </string>
+									<real> 4 </real>
+									<string> "listener" </string>
+									<bool> False </bool>
+									<string> "pos" </string>
+									<vector3> 0, 0, 0 </vector3>
+									<string> "use_environment" </string>
+									<bool> False </bool>
+									<string> "use_orthogonal" </string>
+									<bool> False </bool>
+									<string> "x_rot" </string>
+									<real> 0 </real>
+									<string> "y_rot" </string>
+									<real> 0 </real>
+								</dictionary>
+								<dictionary  shared="false">
+									<string> "distance" </string>
+									<real> 4 </real>
+									<string> "listener" </string>
+									<bool> False </bool>
+									<string> "pos" </string>
+									<vector3> 0, 0, 0 </vector3>
+									<string> "use_environment" </string>
+									<bool> False </bool>
+									<string> "use_orthogonal" </string>
+									<bool> False </bool>
+									<string> "x_rot" </string>
+									<real> 0 </real>
+									<string> "y_rot" </string>
+									<real> 0 </real>
+								</dictionary>
+								<dictionary  shared="false">
+									<string> "distance" </string>
+									<real> 4 </real>
+									<string> "listener" </string>
+									<bool> False </bool>
+									<string> "pos" </string>
+									<vector3> 0, 0, 0 </vector3>
+									<string> "use_environment" </string>
+									<bool> False </bool>
+									<string> "use_orthogonal" </string>
+									<bool> False </bool>
+									<string> "x_rot" </string>
+									<real> 0 </real>
+									<string> "y_rot" </string>
+									<real> 0 </real>
+								</dictionary>
+							</array>
+							<string> "zfar" </string>
+							<real> 500 </real>
+							<string> "znear" </string>
+							<real> 0.1 </real>
+						</dictionary>
+						<string> "Script" </string>
+						<dictionary  shared="false">
+							<string> "current" </string>
+							<int> 0 </int>
+							<string> "sources" </string>
+							<array  len="2" shared="false">
+								<string> "res://bootstrap/gui/modules/module_order/module_order.gd" </string>
+								<string> "res://bootstrap/gui/modules/module_order/module_def.gd" </string>
+							</array>
+						</dictionary>
+					</dictionary>
+					<string> "__editor_run_settings__" </string>
+					<dictionary  shared="false">
+						<string> "custom_args" </string>
+						<string> "-l $scene" </string>
+						<string> "run_mode" </string>
+						<int> 0 </int>
+					</dictionary>
+				</dictionary>
+				<real> 100 </real>
+				<real> 60 </real>
+				<real> 220 </real>
+				<real> 880 </real>
+				<real> 13 </real>
+				<real> 0 </real>
+				<string> "MODULE_LOAD_ORDER_TEXT" </string>
+				<int> 0 </int>
+				<real> -1 </real>
+				<real> 17 </real>
+				<real> 477 </real>
+				<vector2> 0, 460 </vector2>
+				<resource  resource_type="Script" path="res://bootstrap/gui/containers/left_right_container.gd">  </resource>
+				<vector2> 800, 0 </vector2>
+				<real> 5 </real>
+				<real> 21 </real>
+				<real> 46 </real>
+				<real> 155 </real>
+				<string> "MODULE_MOVE_UP" </string>
+				<resource name=""></resource>				<real> 25 </real>
+				<string> "MODULE_MOVE_DOWN" </string>
+				<real> 20 </real>
+				<real> 1040 </real>
+				<int> 30 </int>
+				<real> 167 </real>
+				<string> "MODULE_REFRESH_LIST" </string>
+				<real> 197 </real>
+				<real> 2 </real>
+				<real> 597 </real>
+				<real> 18 </real>
+				<vector2> 100, 0 </vector2>
+				<resource  resource_type="Script" path="res://bootstrap/gui/containers/ok_cancel_swapper.gd">  </resource>
+				<dictionary  shared="false">
+					<string> "_editor_collapsed" </string>
+					<bool> True </bool>
+				</dictionary>
+				<int> 40 </int>
+				<real> 16 </real>
+				<string> "OPTION_OK" </string>
+				<string> "OPTION_CANCEL" </string>
+			</array>
+			<string> "version" </string>
+			<int> 1 </int>
+		</dictionary>
+
+	</main_resource>
+</resource_file>
