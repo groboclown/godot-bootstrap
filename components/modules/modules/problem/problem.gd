@@ -3,7 +3,9 @@ extends AcceptDialog
 
 var bad_modules
 
-func _init(modules):
+var errors = preload("res://bootstrap/lib/error_codes.gd")
+
+func setup(modules):
 	bad_modules = modules
 
 func _ready():
@@ -12,13 +14,16 @@ func _ready():
 	var c = get_node("v/c/v")
 	var md
 	for md in bad_modules:
-		var n = Label()
+		var n = Label.new()
 		n.set_text(md.name + " v" + str(md.version[0]) + "." + str(md.version[1]))
+		c.add_child(n)
+		n = Label.new()
+		# note that the details are not translated.
+		n.set_text(" --> " + tr(errors.to_string(md.error_code)) + " - " + tr(md.error_operation) + " " + md.error_details)
 		c.add_child(n)
 	show()
 	popup_centered()
 	set_exclusive(true)
-	get_label().set_text("MODULE_LOAD_PROBLEM")
 
 
 func _on_failure_confirmed():

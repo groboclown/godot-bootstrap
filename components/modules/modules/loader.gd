@@ -325,7 +325,7 @@ func _create_struct(module_dir):
 		"raw_name": module_dir.get_file(),
 		"version": [ 0, 0 ],
 		"description": "",
-		"classname": "res://scenes/global/modules/module.gd",
+		"classname": "res://bootstrap/lib/modules/module.gd",
 		"error_code": OK,
 		"error_operation": null,
 		"error_details": null,

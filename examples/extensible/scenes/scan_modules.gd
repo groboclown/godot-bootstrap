@@ -19,7 +19,8 @@ func _process(delta):
 	parent.remove_child(self)
 	var bad_modules = modules.get_invalid_modules()
 	if ! bad_modules.empty():
-		var n = load("res://bootstrap/gui/modules/problem.xscn")
+		var n = load("res://bootstrap/gui/modules/problem.xscn").instance()
+		n.setup(bad_modules)
 		parent.add_child(n)
 	else:
 		print("No errors found")
