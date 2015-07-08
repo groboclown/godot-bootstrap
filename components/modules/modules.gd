@@ -16,6 +16,7 @@ var _extension_point_types = {
 	"callback": CallpointCallback.new()
 }
 var _loaded = false
+var _active_modules = null
 
 
 const MODULE_LIST_FILENAME = "module-list.txt"
@@ -32,14 +33,17 @@ var errors = preload("error_codes.gd")
 
 
 
-# TODO keep track of the currently active module list.  When a new one
-# is created, the old one is cleaned up / unloaded.
-
-
 func get_installed_modules():
 	# Returns all the modules that are installed.  Some of these may have
 	# an error in their definition.
 	return Array(_defined_modules)
+
+
+func get_installed_module(module_name, min_major_version, max_major_version, allow_errors = false):
+	for md in _defined_modules:
+		if (allow_errors || md.error_code == OK) && md.name == module_name && md.version[0] >= min_major_version && md.version[0] <= max_major_version:
+			return md
+	return null
 
 
 func get_invalid_modules():
@@ -53,7 +57,17 @@ func get_invalid_modules():
 
 
 func create_active_module_list(module_names, progress = null):
-	return OrderedModules(self, module_names, progress)
+	# There can only be one active module list at a time.  This is a limitation
+	# with the translation server.
+	unload_active_modules()
+	_active_modules = OrderedModules.new(self, module_names, progress)
+	return _active_modules
+
+
+func unload_active_modules():
+	if _active_modules != null:
+		_active_modules.unload()
+		_active_modules = null
 
 
 func add_extension_point_type(type_name, type_obj):
@@ -64,7 +78,7 @@ func add_extension_point_type(type_name, type_obj):
 		print("Bad type object: " + str(type_name))
 		return
 	var mname
-	for mname in [ "validate_callpoint", "validate_type", "convert_type", "aggregate" ]:
+	for mname in [ "validate_call_decl", "validate_implement", "convert_type", "aggregate" ]:
 		if ! type_obj.has_method(mname):
 			print("type " + type_name + " does not implement " + mname)
 			return
@@ -76,27 +90,20 @@ func add_extension_point_type(type_name, type_obj):
 # Initialization methods
 
 
-func ensure_initialized(node, on_error):
-	if ! _loaded:
-		initialize()
-		if ! _loaded:
-			var dialog = load("res://bootstrap/gui/error_dialog.gd").new()
-			dialog.show_warning(node, "ERROR_BAD_MODULE", "", on_error)
-	return _loaded
-
-
 
 func initialize(module_paths, progress = null):
 	# Finds and loads the installed modules.
 	var progress = preload("progress_listener.gd").new(progress)
-	progress.set_value(0.0)
-	var cprog = progress.create_child(0.0, 0.95)
-	load_modules(module_paths, cprog)
+	if ! _initialized:
+		progress.set_value(0.0)
+		var cprog = progress.create_child(0.0, 0.95)
+		_load_modules(module_paths, cprog)
 	progress.set_value(1.0)
 
 
 
 func reload_modules(module_paths = null, progress = null):
+	unload_active_modules()
 	_initialized = false
 	_defined_modules = []
 	if module_paths == null:
@@ -106,8 +113,13 @@ func reload_modules(module_paths = null, progress = null):
 			return
 	initialize(module_paths, progress)
 
+# --------------------------------------------------------------------------
 
-func load_modules(module_paths, progress = null):
+func _init():
+	errors.add_code(ERR_MODULE_NOT_FOUND, "ERR_MODULE_NOT_FOUND")
+
+
+func _load_modules(module_paths, progress):
 	# Loads the list of modules and information about them.
 	# This is intended to run as a background process, and so takes
 	# a "progress_listener" or "Range" UI element as an argument.
@@ -157,11 +169,6 @@ func load_modules(module_paths, progress = null):
 	_initialized = true
 	_loaded = false
 
-
-# --------------------------------------------------------------------------
-
-func _init():
-	errors.add_code(ERR_MODULE_NOT_FOUND, "ERR_MODULE_NOT_FOUND")
 
 
 func _find_modules_for(path, module_dirs):
@@ -249,21 +256,30 @@ class OrderedModules:
 	
 
 	func get_implementation(extension_point_name):
-		return _active.get_value_for(extension_point_name)
+		if is_valid():
+			return _active.get_value_for(extension_point_name)
+		return null
 
 		
 	func is_valid():
-		return _invalid.empty()
+		return _active != null && _invalid.empty()
+	
+	func is_invalid():
+		return ! is_valid()
 
 	func get_invalid_modules():
 		# Returns all the active modules marked as invalid.
 		return _invalid
 
-
 	func get_active_modules():
 		if _active == null:
 			return []
 		return _active.get_active_modules()
+	
+	func unload()
+		if _active != null:
+			_active._unload_active_modules()
+			_active = null
 
 
 # ---------------------------------------------------------------------------
@@ -272,10 +288,10 @@ class OrderedModules:
 class CallpointString:
 	var val_name = "value"
 
-	func validate_callpoint(point):
+	func validate_call_decl(point):
 		return point.aggregate in [ "none", "first", "last", "list", "set" ]
 
-	func validate_type(point, ms):
+	func validate_implement(point, ms):
 		if ! (val_name in point):
 			return false
 		if typeof(point[val_name]) == TYPE_STRING:
@@ -332,7 +348,10 @@ class CallpointString:
 			list.sort()
 			list.invert()
 		return list
-			
+
+
+# ---------------------------------------------------------------------------
+
 
 class CallpointPath:
 	extends CallpointString
@@ -357,11 +376,11 @@ class CallpointPath:
 # ---------------------------------------------------------------------------
 
 class CallpointCallback:
-	func validate_callpoint(point):
+	func validate_call_decl(point):
 		#print("point: " + str(point))
-		return (point.aggregate in [ "none", "first", "last", "sequential", "chain" ])
+		return point.aggregate in [ "none", "first", "last", "sequential", "chain" ]
 
-	func validate_type(point, ms):
+	func validate_implement(point, ms):
 		#print("f: " + point["function"] + ", " + ms.classname + ", " + str(ms.object.has_method(point["function"])))
 		return "function" in point && ms.object != null && ms.object.has_method(point["function"])
 
@@ -369,6 +388,9 @@ class CallpointCallback:
 		return funcref(ms.object, point['function'])
 
 	func aggregate(point, values):
+		if point.order == "reverse":
+			values.invert()
+		
 		if point.aggregate == "none" || point.aggregate == "first":
 			return values[0]
 		elif point.aggregate == "last":
