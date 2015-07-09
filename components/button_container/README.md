@@ -14,7 +14,7 @@ so that items can be added or removed depending on the program state.
 If you are adding the menu directly into your scene, then start by adding a
 `Container` object into your scene tree.  Then, at the bottom of the Inspector
 properties for this new object, select the Script **Load** option, and choose
-the `lib/button_container.gd` file.
+the `res://bootstrap/gui/containers/button_container.gd` file.
 
 You can select these different behaviors:
 * `horizontal_buttons` - (boolean) `true` if the buttons should be aligned

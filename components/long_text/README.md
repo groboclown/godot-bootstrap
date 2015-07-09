@@ -9,6 +9,8 @@ It uses the Label theme for display.
 
 It expects to be embedded inside a ScrollContainer, but doesn't have to.
 
+![example](long_text.png)
+
 **Category**: `gui`
 
 
