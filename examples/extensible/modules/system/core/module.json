@@ -1,0 +1,46 @@
+{
+  "name": "core",
+  "version": [ 1, 0 ],
+  "description": "Core program module.",
+  "classname": "module.gd",
+  
+  "calls": {
+	"init/game-data": {
+		"description": "setup the data at start time.  Useful if a module is loaded after a new game is started.  Takes 1 argument - the game data, returns nothing.",
+		"type": "callback",
+		"aggregate": "sequential"
+	},
+	"init/first-scene": {
+		"description": "The first scene (xscn) file to load for a new game.",
+		"type": "path",
+		"aggregate": "last"
+	},
+	
+	
+	"player/starting-location": {
+		"description": "Location on the map where the player starts the game.",
+		"type": "2d",
+		"aggregate": "last"
+	}
+  },
+  
+  "implements": {
+	"init/custom-data": {
+		"type": "callback",
+		"function": "init_custom_data"
+	},
+	"init/game-data": {
+		"type": "callback",
+		"function": "init_game_data"
+	},
+	"init/first-scene": {
+		"type": "path",
+		"path": "scene_1.xscn"
+	},
+	"player/starting-location": {
+		"type": "2d",
+		"point": [ 1.0, 1.0 ]
+	}
+  }
+
+}

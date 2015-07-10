@@ -8,8 +8,10 @@ with said modules.  Once the modules are loaded, the API uses a single, simple
 `get_implementation(String::extension_point)` method to access the extensible
 parts that modules can implement.
 
+The component includes default GUI components for showing errors in module
+loading, and for selecting the module order.
 
-**Category** `lib`
+**Category** `lib`, `gui`
 **Requires** `error_codes, progress_listener, error_dialog`
 
 
@@ -140,10 +142,20 @@ information to the user.
 
 The GDScript file name of the object that processes the module logic.
 It must be within the module directory directly, and not in a sub-directory.
-It must take a single argument in its `_init()` method.
 
 If this value isn't specified, then the default `modules/module.md` class is
 used instead.
+
+The class object can provide the `deactivate()` and `activate(ext_point_access)`
+methods.  Note that the `activate` method will only be called if the
+`deactivate` method exists.  When the module is loaded into an ordered active
+set, the `activate` method will be called with a single parameter object
+that provides the one method `get_implementation(String::extension_point_name) : Variant`.
+If the module caches this object, then the cached version *must* be cleared
+out when `deactivate` is called.
+
+The class object is also used for `callback` extension points, and is available
+for custom extension point types to use.
 
 #### translations - `[ String, ... ]`, optional
 
@@ -296,18 +308,18 @@ class MyCustomCallpointType:
 			&& (point.aggregate in [ "none", "first", "last" ])
 	
 	
-	func validate_implement(point, ms):
+	func validate_implement(ext, ms):
 		# Checks whether the extension point implementation (under the "calls"
 		# group) is valid.  Returns a boolean value.
 		return ms.object.has_method("convert") && \
-			"point" in point && typeof(point.point) == TYPE_ARRAY && \
-			point.size() == 2 && typeof(point[0]) == TYPE_INT && \
-			typeof(point[1]) == TYPE_INT
+			"position" in ext && typeof(ext.position) == TYPE_ARRAY && \
+			ext.position.size() == 2 && typeof(ext.position[0]) == TYPE_INT && \
+			typeof(ext.position[1]) == TYPE_INT
 
-	func convert_type(point, ms):
+	func convert_type(ext, ms):
 		# Convert the extension point implementation (under the "calls" group)
 		# into the expected value.
-		return ms.object.convert(Vector2(point[0], point[1]))
+		return ms.object.convert(Vector2(ext.position[0], ext.position[1]))
 
 	func aggregate(point, values):
 		# Aggregate the list of values from the convert_type return value

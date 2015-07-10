@@ -6,29 +6,42 @@ var _order = []
 var _selected_child = null
 var _update_obj
 var _update_func
+var _close_func
 
-func setup(modules, update_obj, update_func, order = null):
+func setup(modules, update_obj, update_func, close_func, order = null):
 	_modules = modules
 	_update_obj = update_obj
 	_update_func = update_func
+	_close_func = close_func
 	if order != null:
 		_order = order
-	
+
 
 func get_order():
 	return _order
 
 func _ready():
-	_on_Refresh_pressed()
+	show_modules()
+	
+	# The "h" node must be right below the label, so ensure that's the case.
+	var ln = get_node("Label")
+	ln.connect("minimum_size_changed", self, "_on_label_resized")
+	ln.connect("item_rect_changed", self, "_on_label_resized")
+	ln.connect("resized", self, "_on_label_resized")
+	ln.connect("size_flags_changed", self, "_on_label_resized")
+	
+	_on_label_resized()
 
 
 func show_modules():
+	if _modules == null:
+		return
 	var md
 	var named = {}
 	for md in _modules.get_installed_modules():
 		named[md.name] = md
 	
-	var cn = get_node("p/v/h/s/v")
+	var cn = get_node("h/s/v")
 	var kid
 	for kid in cn.get_children():
 		cn.remove_child(kid)
@@ -47,16 +60,16 @@ func show_modules():
 		cn.add_child(kid)
 
 
-
 func _on_Refresh_pressed():
 	# TODO make a background process
-	var progress = get_node("p/o/h/RefreshProgress")
-	progress.show()
-	_modules.reload_modules(null, progress)
+	if _modules != null:
+		var progress = get_node("v/h2/RefreshProgress")
+		progress.show()
+		_modules.reload_modules(null, progress)
 	
-	show_modules()
+		show_modules()
 	
-	progress.hide()
+		progress.hide()
 
 
 
@@ -108,7 +121,7 @@ func _on_down_pressed():
 func set_selected_module_node(node):
 	_selected_child = node
 	var c
-	for c in get_node("p/v/h/s/v").get_children():
+	for c in get_node("h/s/v").get_children():
 		c.on_module_selected(node.module)
 
 
@@ -121,19 +134,31 @@ func set_module_active_state(md, active_state):
 func _on_OK_pressed():
 	# Save the order state to options
 	_order = []
-	var cn = get_node("p/v/h/s/v")
+	var cn = get_node("h/s/v")
 	var kid
 	for kid in cn.get_children():
 		if kid.has_method("is_active_module") && kid.is_active_module():
 			var md = kid.module
-			_order.append([ md.name, md.version ])
+			#_order.append([ md.name, md.version ])
+			_order.append(md.name)
 	
 	_update_obj.call(_update_func, _order)
 	
 	# remove ourself
-	get_parent().remove_child(self)
+	_close_self(true)
 
 
 func _on_Cancel_pressed():
 	# just remove ourself
-	get_parent().remove_child(self)
+	_close_self(false)
+
+func _close_self(accepted):
+	if _close_func != null:
+		_update_obj.call(_close_func, accepted)
+
+
+func _on_label_resized():
+	var ln = get_node("Label")
+	var hn = get_node("h")
+	hn.set_margin(MARGIN_TOP, ln.get_size().y + 4)
+	

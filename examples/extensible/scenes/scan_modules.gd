@@ -15,7 +15,7 @@ func _process(delta):
 		return
 	
 	var progress = get_node("c/v/progress")
-	modules.reload_modules([ "res://modules" ], progress)
+	modules.reload_modules([ "res://modules/system", "res://modules/purchased", "res://modules/user_generated" ], progress)
 	parent.remove_child(self)
 	var bad_modules = modules.get_invalid_modules()
 	if ! bad_modules.empty():
@@ -24,14 +24,5 @@ func _process(delta):
 		parent.add_child(n)
 	else:
 		print("No errors found")
-		#var n = load("res://bootstrap/gui/error_dialog.gd").new()
-		#n.show_warning(parent, "Module Load", "No problems found in modules.", "")
-		
-		var n = load("res://bootstrap/gui/modules/module_order.xscn").instance()
-		
-		# TODO setup the order
-		n.setup(modules, self, "_on_order_set", [])
-		parent.add_child(n)
-
-func _on_order_set(new_order):
-	pass
+		for m in modules.get_installed_modules():
+			print("found " + m.name)

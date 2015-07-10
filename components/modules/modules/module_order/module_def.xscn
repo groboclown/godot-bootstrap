@@ -81,13 +81,13 @@
 				<resource  resource_type="Script" path="res://bootstrap/gui/modules/module_order/module_def.gd">  </resource>
 				<dictionary  shared="false">
 					<string> "__editor_plugin_screen__" </string>
-					<string> "Script" </string>
+					<string> "2D" </string>
 					<string> "__editor_plugin_states__" </string>
 					<dictionary  shared="false">
 						<string> "2D" </string>
 						<dictionary  shared="false">
 							<string> "ofs" </string>
-							<vector2> -162.033, -458.182 </vector2>
+							<vector2> -253.88, -199.22 </vector2>
 							<string> "snap_grid" </string>
 							<bool> False </bool>
 							<string> "snap_offset" </string>
@@ -107,7 +107,7 @@
 							<string> "snap_step" </string>
 							<vector2> 10, 10 </vector2>
 							<string> "zoom" </string>
-							<real> 0.440127 </real>
+							<real> 0.663421 </real>
 						</dictionary>
 						<string> "3D" </string>
 						<dictionary  shared="false">
@@ -226,7 +226,7 @@
 				<resource name=""></resource>				<int> 0 </int>
 				<real> 30 </real>
 				<real> 233 </real>
-				<real> 800 </real>
+				<real> 640 </real>
 				<real> 246 </real>
 				<real> 0 </real>
 				<real> -1 </real>

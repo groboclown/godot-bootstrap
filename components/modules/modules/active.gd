@@ -7,11 +7,6 @@ var _callpoints = {}
 var _modules = []
 var _extension_point_types = {}
 
-const _types = [
-	"path", "callback", "string", "vector2", "vector3", "rect2", "rect3",
-	"dict"
-]
-
 const ERR_MODULE_DEPENDENT_MODULE_VERSION = 50005
 const ERR_MODULE_DEPENDENT_MODULE_ORDER = 50006
 const ERR_MODULE_DEPENDENT_MODULE_NOT_LOADED = 50007
@@ -68,7 +63,7 @@ func validate_ordered_modules(ordered_module_structs):
 					found = true
 					ms.error_code = ERR_MODULE_DEPENDENT_MODULE_NOT_LOADED
 					ms.error_operation = "evaluate-modules"
-					ms.error_details = lm.name
+					ms.error_details = req.module
 					incorrect_modules.append(ms)
 				break
 		
@@ -117,6 +112,7 @@ func set_modules(ordered_module_structs):
 	_unload_active_modules()
 	_callpoints = {}
 	_modules = ordered_module_structs
+	var wrapper = ModuleWrapper.new(self)
 	
 	var ms
 	var cpkey
@@ -135,6 +131,9 @@ func set_modules(ordered_module_structs):
 		var xl
 		for xl in ms.translations:
 			TranslationServer.add_translation(xl)
+		
+		if ms.object.has_method("activate") && ms.object.has_method("deactivate"):
+			ms.object.activate(wrapper)
 
 
 
@@ -162,6 +161,8 @@ func _unload_active_modules():
 		for md in _modules:
 			for xl in md.translations:
 				TranslationServer.remove_translation(xl)
+			if md.object.has_method("deactivate"):
+				md.object.deactivate()
 	_modules = []
 	_callpoints = {}
 
@@ -184,14 +185,23 @@ func _validate_callpoint_matches(left, right):
 
 
 func _init(extension_point_types):
-	add_code(ERR_MODULE_DEPENDENT_MODULE_VERSION, "ERR_MODULE_DEPENDENT_MODULE_VERSION")
-	add_code(ERR_MODULE_DEPENDENT_MODULE_ORDER, "ERR_MODULE_DEPENDENT_MODULE_ORDER")
-	add_code(ERR_MODULE_DEPENDENT_MODULE_NOT_LOADED, "ERR_MODULE_DEPENDENT_MODULE_NOT_LOADED")
-	add_code(ERR_MODULE_MISMATCHED_EXTENSION_POINT, "ERR_MODULE_MISMATCHED_EXTENSION_POINT")
-	add_code(ERR_MODULE_MISMATCHED_IMPLEMENTATION, "ERR_MODULE_MISMATCHED_IMPLEMENTATION")
-	add_code(ERR_MODULE_UNKNOWN_EXTENSION_POINT, "ERR_MODULE_UNKNOWN_EXTENSION_POINT")
+	errors.add_code(ERR_MODULE_DEPENDENT_MODULE_VERSION, "ERR_MODULE_DEPENDENT_MODULE_VERSION")
+	errors.add_code(ERR_MODULE_DEPENDENT_MODULE_ORDER, "ERR_MODULE_DEPENDENT_MODULE_ORDER")
+	errors.add_code(ERR_MODULE_DEPENDENT_MODULE_NOT_LOADED, "ERR_MODULE_DEPENDENT_MODULE_NOT_LOADED")
+	errors.add_code(ERR_MODULE_MISMATCHED_EXTENSION_POINT, "ERR_MODULE_MISMATCHED_EXTENSION_POINT")
+	errors.add_code(ERR_MODULE_MISMATCHED_IMPLEMENTATION, "ERR_MODULE_MISMATCHED_IMPLEMENTATION")
+	errors.add_code(ERR_MODULE_UNKNOWN_EXTENSION_POINT, "ERR_MODULE_UNKNOWN_EXTENSION_POINT")
 
 	var key
 	for key in extension_point_types.keys():
 		_extension_point_types[key] = extension_point_types[key]
 
+
+class ModuleWrapper:
+	var _active
+	
+	func _init(active):
+		_active = active
+	
+	func get_implementation(extension_point_name):
+		return _active.get_value_for(extension_point_name)

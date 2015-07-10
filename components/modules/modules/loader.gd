@@ -23,7 +23,7 @@ func load_module(module_dir, extension_points):
 	var ret = _create_struct(module_dir)
 	
 	var f = File.new()
-	var json_path = module_dir.plus_file(MODULE_DESCRIPTION_FILENAME)
+	var json_path = module_dir + "/" + MODULE_DESCRIPTION_FILENAME
 	var err = f.open(json_path, File.READ)
 	
 	if err != OK:
@@ -67,7 +67,7 @@ func load_module(module_dir, extension_points):
 	
 	
 	_process_module(ret, metadata, extension_points)
-	print(str(ret))
+	#print(str(ret))
 	return ret
 
 
@@ -111,13 +111,20 @@ func _process_module(module, md, extension_points):
 			module.error_operation = "process"
 			module.error_details = "classname"
 			return
-		module.classname = module.dir.plus_file(md.classname)
+		module.classname = module.dir + "/" + md.classname
 	module.class_object = load(module.classname)
 	if module.class_object == null:
 		module.error_code = ERR_MODULE_INVALID_DEFINITION
 		module.error_operation = "process"
 		module.error_details = "classname"
 		return
+	module.object = module.class_object.new()
+	if module.object == null:
+		module.error_code = ERR_MODULE_INVALID_DEFINITION
+		module.error_operation = "process"
+		module.error_details = "classname.new"
+		return
+	
 	
 	
 	if "translations" in md:
@@ -131,9 +138,9 @@ func _process_module(module, md, extension_points):
 			if typeof(tname) != TYPE_STRING:
 				module.error_code = ERR_MODULE_INVALID_DEFINITION
 				module.error_operation = "process"
-				module.error_details = "translations"
+				module.error_details = "translations[" + str(tname) + "]"
 				return
-			var tpath = module.dir.plus_file(tname)
+			var tpath = module.dir + "/" + tname
 			var xl = load(tpath)
 			if xl == null:
 				module.error_code = ERR_MODULE_INVALID_DEFINITION
@@ -172,19 +179,19 @@ func _process_module(module, md, extension_points):
 				"max": 2147483646
 			}
 			if "min" in req:
-				if typeof(req["min"]) != TYPE_INT:
+				if typeof(req["min"]) != TYPE_INT && typeof(req["min"]) != TYPE_REAL:
 					module.error_code = ERR_MODULE_INVALID_DEFINITION
 					module.error_operation = "process"
 					module.error_details = "requires[" + str(index) + "][min]"
 					return
-				r["min"] = req["min"]
+				r["min"] = int(req["min"])
 			if "max" in req:
-				if typeof(req["max"]) != TYPE_INT:
+				if typeof(req["max"]) != TYPE_INT && typeof(req["max"]) != TYPE_REAL:
 					module.error_code = ERR_MODULE_INVALID_DEFINITION
 					module.error_operation = "process"
 					module.error_details = "requires[" + str(index) + "][max]"
 					return
-				r["max"] = req["max"]
+				r["max"] = int(req["max"])
 			module.requires.append(r)
 			index += 1
 	
@@ -237,7 +244,7 @@ func _process_module(module, md, extension_points):
 				module.error_operation = "process"
 				module.error_details = "calls[" + key + "]"
 				return
-			if ! extension_points[val.type].validate_callpoint(val):
+			if ! extension_points[val.type].validate_call_decl(val):
 				module.error_code = ERR_MODULE_INVALID_EXTENSION_POINT
 				module.error_operation = "process"
 				module.error_details = "calls[" + key + "]"
@@ -281,9 +288,9 @@ func _process_module(module, md, extension_points):
 			if ! (val.type in extension_points):
 				module.error_code = ERR_MODULE_INVALID_IMPLEMENTATION_POINT
 				module.error_operation = "process"
-				module.error_details = "implements[" + str(key) + "][type]"
+				module.error_details = "implements[" + str(key) + "][!type]"
 				return
-			if ! extension_points[val.type].validate_type(val, module):
+			if ! extension_points[val.type].validate_implement(val, module):
 				module.error_code = ERR_MODULE_INVALID_IMPLEMENTATION_POINT
 				module.error_operation = "process"
 				module.error_details = "implements[" + str(key) + "][type]"

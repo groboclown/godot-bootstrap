@@ -15,8 +15,8 @@ var _extension_point_types = {
 	"path": CallpointPath.new(),
 	"callback": CallpointCallback.new()
 }
+var _active_modules
 var _loaded = false
-var _active_modules = null
 
 
 const MODULE_LIST_FILENAME = "module-list.txt"
@@ -33,17 +33,14 @@ var errors = preload("error_codes.gd")
 
 
 
+# TODO keep track of the currently active module list.  When a new one
+# is created, the old one is cleaned up / unloaded.
+
+
 func get_installed_modules():
 	# Returns all the modules that are installed.  Some of these may have
 	# an error in their definition.
 	return Array(_defined_modules)
-
-
-func get_installed_module(module_name, min_major_version, max_major_version, allow_errors = false):
-	for md in _defined_modules:
-		if (allow_errors || md.error_code == OK) && md.name == module_name && md.version[0] >= min_major_version && md.version[0] <= max_major_version:
-			return md
-	return null
 
 
 func get_invalid_modules():
@@ -57,30 +54,25 @@ func get_invalid_modules():
 
 
 func create_active_module_list(module_names, progress = null):
-	# There can only be one active module list at a time.  This is a limitation
-	# with the translation server.
-	unload_active_modules()
-	_active_modules = OrderedModules.new(self, module_names, progress)
-	return _active_modules
-
-
-func unload_active_modules():
-	if _active_modules != null:
-		_active_modules.unload()
-		_active_modules = null
+	if _active_modules == null:
+		_active_modules = preload("modules/active.gd").new(_extension_point_types)
+	return OrderedModules.new(self, module_names, progress)
 
 
 func add_extension_point_type(type_name, type_obj):
-	if type_name == null || typeof(type_name) != TYPE_STRING || type_name in _extension_point_types:
-		print("Bad type name: " + str(type_name))
+	if _active_modules != null:
+		print("ERROR Can only be called before create_active_module_list is called.")
 		return
-	if type_obj == null || typeof(type_name) != TYPE_OBJECT:
-		print("Bad type object: " + str(type_name))
+	if type_name == null || typeof(type_name) != TYPE_STRING || type_name in _extension_point_types:
+		print("ERROR Bad type name: " + str(type_name))
+		return
+	if type_obj == null:
+		print("ERROR Bad type object: " + str(type_name))
 		return
 	var mname
 	for mname in [ "validate_call_decl", "validate_implement", "convert_type", "aggregate" ]:
 		if ! type_obj.has_method(mname):
-			print("type " + type_name + " does not implement " + mname)
+			print("ERROR type " + type_name + " does not implement " + mname)
 			return
 	_extension_point_types[type_name] = type_obj
 
@@ -90,20 +82,27 @@ func add_extension_point_type(type_name, type_obj):
 # Initialization methods
 
 
+func ensure_initialized(node, on_error):
+	if ! _loaded:
+		initialize()
+		if ! _loaded:
+			var dialog = load("res://bootstrap/gui/error_dialog.gd").new()
+			dialog.show_warning(node, "ERROR_BAD_MODULE", "", on_error)
+	return _loaded
+
+
 
 func initialize(module_paths, progress = null):
 	# Finds and loads the installed modules.
 	var progress = preload("progress_listener.gd").new(progress)
-	if ! _initialized:
-		progress.set_value(0.0)
-		var cprog = progress.create_child(0.0, 0.95)
-		_load_modules(module_paths, cprog)
+	progress.set_value(0.0)
+	var cprog = progress.create_child(0.0, 0.95)
+	load_modules(module_paths, cprog)
 	progress.set_value(1.0)
 
 
 
 func reload_modules(module_paths = null, progress = null):
-	unload_active_modules()
 	_initialized = false
 	_defined_modules = []
 	if module_paths == null:
@@ -113,13 +112,8 @@ func reload_modules(module_paths = null, progress = null):
 			return
 	initialize(module_paths, progress)
 
-# --------------------------------------------------------------------------
 
-func _init():
-	errors.add_code(ERR_MODULE_NOT_FOUND, "ERR_MODULE_NOT_FOUND")
-
-
-func _load_modules(module_paths, progress):
+func load_modules(module_paths, progress = null):
 	# Loads the list of modules and information about them.
 	# This is intended to run as a background process, and so takes
 	# a "progress_listener" or "Range" UI element as an argument.
@@ -150,15 +144,6 @@ func _load_modules(module_paths, progress):
 	var loader = preload("modules/loader.gd").new()
 	for mod_dir in module_dirs:
 		var config = loader.load_module(mod_dir, _extension_point_types)
-		if config.error_code == OK && config.class_object != null:
-			# Object creation must be done here, because it takes this object as
-			# the first argument.
-			#print("creating " + module.classname + " " + str(module.class_object))
-			config.object = config.class_object.new(self)
-			if config.object == null:
-				config.error_code = errors.ERR_MODULE_INVALID_DEFINITION
-				config.error_operation = "instance"
-				config.error_details = config.classname + ".new()"
 		cprog.set_value(index)
 		index += 1
 		
@@ -169,6 +154,11 @@ func _load_modules(module_paths, progress):
 	_initialized = true
 	_loaded = false
 
+
+# --------------------------------------------------------------------------
+
+func _init():
+	errors.add_code(ERR_MODULE_NOT_FOUND, "ERR_MODULE_NOT_FOUND")
 
 
 func _find_modules_for(path, module_dirs):
@@ -218,11 +208,12 @@ func _find_modules_for(path, module_dirs):
 class OrderedModules:
 	var _invalid = []
 	var _order = []
-	var _active = null
+	var _modobj
 	
 	func _init(module_obj, module_names, progress):
 		# Takes the list of module names, and sets them as the current order of
-		# the underlying `_active` object
+		# the underlying `_active_modules` object
+		_modobj = module_obj
 		
 		progress = preload("progress_listener.gd").new(progress)
 		progress.set_value(0.0)
@@ -231,55 +222,43 @@ class OrderedModules:
 		var order = []
 		var name
 		for name in module_names:
+			print("Checking name " + name)
 			var found = false
 			var md
 			for md in module_obj._defined_modules:
-				if md["name"] == name:
+				print("Found " + md.name)
+				if md.name == name:
 					found = true
 					order.append(md)
 					break
 			if ! found:
 				md = loader._create_struct("")
+				md.name = name
 				md.error_code = module_obj.ERR_MODULE_NOT_FOUND
 				md.error_operation = "order"
 				md.error_details = name
 				order.append(md)
 		
-		_active = preload("modules/active.gd")
-		_invalid = _active.validate_ordered_modules(order)
+		_invalid = module_obj._active_modules.validate_ordered_modules(order)
 		if _invalid.empty():
-			_active.set_modules(order)
+			module_obj._active_modules.set_modules(order)
 		else:
-			_active.set_modules([])
+			module_obj._active_modules.set_modules([])
 		
 		return _invalid
 	
-
 	func get_implementation(extension_point_name):
-		if is_valid():
-			return _active.get_value_for(extension_point_name)
-		return null
-
+		return _modobj._active_modules.get_value_for(extension_point_name)
 		
 	func is_valid():
-		return _active != null && _invalid.empty()
-	
-	func is_invalid():
-		return ! is_valid()
+		return _invalid.empty()
 
 	func get_invalid_modules():
 		# Returns all the active modules marked as invalid.
 		return _invalid
 
 	func get_active_modules():
-		if _active == null:
-			return []
-		return _active.get_active_modules()
-	
-	func unload()
-		if _active != null:
-			_active._unload_active_modules()
-			_active = null
+		return _modobj._active_modules.get_active_modules()
 
 
 # ---------------------------------------------------------------------------
@@ -348,10 +327,7 @@ class CallpointString:
 			list.sort()
 			list.invert()
 		return list
-
-
-# ---------------------------------------------------------------------------
-
+			
 
 class CallpointPath:
 	extends CallpointString
@@ -378,19 +354,20 @@ class CallpointPath:
 class CallpointCallback:
 	func validate_call_decl(point):
 		#print("point: " + str(point))
-		return point.aggregate in [ "none", "first", "last", "sequential", "chain" ]
+		return (point.aggregate in [ "none", "first", "last", "sequential", "chain" ])
 
 	func validate_implement(point, ms):
-		#print("f: " + point["function"] + ", " + ms.classname + ", " + str(ms.object.has_method(point["function"])))
+		#print("f: " + point["function"] + ", " + ms.classname)
+		#if ms.object != null:
+		#	print("   " + str(ms.object.has_method(point["function"])))
+		#else:
+		#	print("   obj is null")
 		return "function" in point && ms.object != null && ms.object.has_method(point["function"])
 
 	func convert_type(point, ms):
 		return funcref(ms.object, point['function'])
 
 	func aggregate(point, values):
-		if point.order == "reverse":
-			values.invert()
-		
 		if point.aggregate == "none" || point.aggregate == "first":
 			return values[0]
 		elif point.aggregate == "last":
