@@ -32,6 +32,13 @@ func _ready():
 		name += ": " + tr(module.error_operation) + " " + module.error_details + " (" + tr(errors.to_string(module.error_code)) + ")"
 	get_node("name").set_text(name)
 	get_node("CheckBox").set_pressed(_active)
+	
+	connect("minimum_size_changed", self, "_on_resized")
+	connect("item_rect_changed", self, "_on_resized")
+	connect("resized", self, "_on_resized")
+	connect("size_flags_changed", self, "_on_resized")
+	
+	_on_resized()
 
 
 func _draw():
@@ -86,3 +93,10 @@ func _on_HBoxContainer_mouse_enter():
 func _on_HBoxContainer_mouse_exit():
 	_hover = false
 	update()
+
+
+func _on_resized():
+	var p = get_parent()
+	if p != null:
+		# TODO change - to be the hbar width
+		set_size(Vector2(p.get_size().x - 4, get_size().y))

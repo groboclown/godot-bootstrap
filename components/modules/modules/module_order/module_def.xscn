@@ -6,9 +6,9 @@
 			<string> "conn_count" </string>
 			<int> 4 </int>
 			<string> "conns" </string>
-			<int_array  len="24"> 				0, 0, 49, 48, 2, 0, 0, 0, 51, 50, 2, 0, 0, 0, 53, 52, 2, 0, 1, 0, 55, 54, 2, 0 </int_array>
+			<int_array  len="24"> 				0, 0, 48, 47, 2, 0, 0, 0, 50, 49, 2, 0, 0, 0, 52, 51, 2, 0, 1, 0, 54, 53, 2, 0 </int_array>
 			<string> "names" </string>
-			<string_array  len="56">
+			<string_array  len="55">
 				<string> "HBoxContainer" </string>
 				<string> "_import_path" </string>
 				<string> "process/pause_mode" </string>
@@ -18,7 +18,6 @@
 				<string> "visibility/light_mask" </string>
 				<string> "anchor/right" </string>
 				<string> "anchor/bottom" </string>
-				<string> "rect/min_size" </string>
 				<string> "focus_neighbour/left" </string>
 				<string> "focus_neighbour/top" </string>
 				<string> "focus_neighbour/right" </string>
@@ -69,15 +68,14 @@
 			<string> "node_count" </string>
 			<int> 3 </int>
 			<string> "nodes" </string>
-			<int_array  len="173"> 				-1, -1, 0, 0, -1, 20, 1, 0, 2, 1, 3, 2, 4, 3, 5, 3, 6, 4, 7, 4, 8, 4, 9, 5, 10, 0, 11, 0, 12, 0, 13, 0, 14, 6, 15, 6, 16, 7, 17, 1, 18, 3, 19, 8, 20, 9, 0, 0, 0, 21, 21, -1, 26, 1, 0, 2, 1, 3, 2, 4, 3, 5, 3, 6, 4, 22, 10, 23, 11, 10, 0, 11, 0, 12, 0, 13, 0, 14, 6, 15, 2, 16, 1, 17, 1, 18, 3, 24, 6, 25, 2, 26, 6, 27, 6, 28, 12, 29, 13, 30, 6, 31, 6, 32, 14, 0, 0, 0, 34, 33, -1, 30, 1, 0, 3, 2, 4, 3, 5, 3, 6, 4, 35, 15, 36, 16, 22, 17, 23, 18, 10, 0, 11, 0, 12, 0, 13, 0, 14, 2, 15, 2, 16, 7, 18, 3, 37, 19, 38, 3, 39, 3, 40, 3, 41, 19, 42, 6, 43, 6, 28, 12, 32, 14, 44, 14, 45, 6, 46, 6, 47, 20, 0 </int_array>
+			<int_array  len="171"> 				-1, -1, 0, 0, -1, 19, 1, 0, 2, 1, 3, 2, 4, 3, 5, 3, 6, 4, 7, 4, 8, 4, 9, 0, 10, 0, 11, 0, 12, 0, 13, 5, 14, 5, 15, 6, 16, 1, 17, 3, 18, 7, 19, 8, 0, 0, 0, 20, 20, -1, 26, 1, 0, 2, 1, 3, 2, 4, 3, 5, 3, 6, 4, 21, 9, 22, 10, 9, 0, 10, 0, 11, 0, 12, 0, 13, 5, 14, 2, 15, 1, 16, 1, 17, 3, 23, 5, 24, 2, 25, 5, 26, 5, 27, 11, 28, 12, 29, 5, 30, 5, 31, 13, 0, 0, 0, 33, 32, -1, 30, 1, 0, 3, 2, 4, 3, 5, 3, 6, 4, 34, 14, 35, 15, 21, 16, 22, 17, 9, 0, 10, 0, 11, 0, 12, 0, 13, 2, 14, 2, 15, 6, 17, 3, 36, 18, 37, 3, 38, 3, 39, 3, 40, 18, 41, 5, 42, 5, 27, 11, 31, 13, 43, 13, 44, 5, 45, 5, 46, 19, 0 </int_array>
 			<string> "variants" </string>
-			<array  len="21" shared="false">
+			<array  len="20" shared="false">
 				<node_path> "" </node_path>
 				<int> 2 </int>
 				<bool> True </bool>
 				<real> 1 </real>
 				<int> 1 </int>
-				<vector2> 800, 0 </vector2>
 				<bool> False </bool>
 				<int> 3 </int>
 				<resource  resource_type="Script" path="res://bootstrap/gui/modules/module_order/module_def.gd">  </resource>
@@ -206,7 +204,7 @@
 						<string> "Script" </string>
 						<dictionary  shared="false">
 							<string> "current" </string>
-							<int> 6 </int>
+							<int> 0 </int>
 							<string> "sources" </string>
 							<array  len="2" shared="false">
 								<string> "res://bootstrap/gui/modules/module_order/module_def.gd" </string>
@@ -223,13 +221,13 @@
 					</dictionary>
 				</dictionary>
 				<real> 26 </real>
-				<real> 800 </real>
+				<real> 480 </real>
 				<string> "" </string>
 				<resource name=""></resource>				<int> 0 </int>
 				<real> 30 </real>
-				<real> 393 </real>
-				<real> 1280 </real>
-				<real> 406 </real>
+				<real> 233 </real>
+				<real> 800 </real>
+				<real> 246 </real>
 				<real> 0 </real>
 				<real> -1 </real>
 			</array>
