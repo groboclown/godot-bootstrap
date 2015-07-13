@@ -37,7 +37,7 @@ func start_new_game(modules, module_order):
 
 	load_scene(_active_modules.get_implementation("init/first-scene")[0])
 
-
+	return true
 
 func load_scene(next_scene):
 	_current_scene = _active_modules.get_implementation("init/first-scene")[0]

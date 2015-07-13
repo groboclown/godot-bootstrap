@@ -25,10 +25,6 @@
   },
   
   "implements": {
-	"init/custom-data": {
-		"type": "callback",
-		"function": "init_custom_data"
-	},
 	"init/game-data": {
 		"type": "callback",
 		"function": "init_game_data"

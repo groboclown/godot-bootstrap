@@ -32,11 +32,11 @@ func _on_new_game():
 		var dialog = load("res://bootstrap/gui/error_dialog.gd").new()
 		dialog.show_warning(self, "Modules", "No modules found, or they haven't been loaded yet.", null)
 		return
-	if ! global_modules.get_invalid_modules().empty():
-		var n = load("res://bootstrap/gui/modules/problem.xscn").instance()
-		n.setup(global_modules.get_invalid_modules())
-		add_child(n)
-		return
+	#if ! global_modules.get_invalid_modules().empty():
+	#	var n = load("res://bootstrap/gui/modules/problem.xscn").instance()
+	#	n.setup(global_modules.get_invalid_modules())
+	#	add_child(n)
+	#	return
 
 	var order_wrapper = get_node("module_order")
 	var order = order_wrapper.get_node("Panel")

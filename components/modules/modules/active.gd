@@ -14,6 +14,9 @@ const ERR_MODULE_MISMATCHED_EXTENSION_POINT = 50008
 const ERR_MODULE_MISMATCHED_IMPLEMENTATION = 50009
 const ERR_MODULE_UNKNOWN_EXTENSION_POINT = 50010
 
+const ACTIVATION_ERROR_START = ERR_MODULE_DEPENDENT_MODULE_VERSION
+const ACTIVATION_ERROR_END = ERR_MODULE_UNKNOWN_EXTENSION_POINT
+
 var errors = preload("../error_codes.gd")
 
 
@@ -31,6 +34,11 @@ func validate_ordered_modules(ordered_module_structs):
 	var ms
 	
 	for ms in ordered_module_structs:
+		if ms.error_code >= ACTIVATION_ERROR_START && ms.error_code <= ACTIVATION_ERROR_END:
+			# re-validate the module
+			ms.error_code = OK
+			ms.error_operation = null
+			ms.error_details = null
 		if ms.error_code != OK:
 			incorrect_modules.append(ms)
 			continue
@@ -102,6 +110,8 @@ func validate_ordered_modules(ordered_module_structs):
 				incorrect_modules.append(ms)
 				break
 		
+		loaded_modules.append(ms)
+		
 	return incorrect_modules
 
 
@@ -145,8 +155,7 @@ func get_value_for(callback_name):
 		for ms in _callpoints[callback_name].impl:
 			var point = ms.implement_points[callback_name]
 			ret.append(_extension_point_types[type].convert_type(point, ms))
-		if ! ret.empty():
-			ret = [ _extension_point_types[type].aggregate(_callpoints[callback_name].point, ret) ]
+		ret = _extension_point_types[type].aggregate(_callpoints[callback_name].point, ret)
 	return ret
 
 

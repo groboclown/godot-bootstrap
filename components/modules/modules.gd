@@ -222,11 +222,9 @@ class OrderedModules:
 		var order = []
 		var name
 		for name in module_names:
-			print("Checking name " + name)
 			var found = false
 			var md
 			for md in module_obj._defined_modules:
-				print("Found " + md.name)
 				if md.name == name:
 					found = true
 					order.append(md)
@@ -352,6 +350,46 @@ class CallpointPath:
 # ---------------------------------------------------------------------------
 
 class CallpointCallback:
+
+	# funcref doesn't act as documented, so we need our own
+	# custom funcref object.
+	class Exec:
+		var _name
+		var _obj
+		
+		func _init(obj, name):
+			_name = name
+			_obj = obj
+		
+		func exec(arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null, arg6 = null, arg7 = null, arg8 = null, arg9 = null):
+			var args = [ arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 ]
+			for i in range(9, 0, -1):
+				if args[i] != null:
+					break
+				args.resize(i)
+			_obj.callv(_name, args)
+
+	class Callback:
+		var _values
+		var _add_result
+		
+		func _init(values, add_result):
+			_values = values
+			_add_result = add_result
+		
+		func exec(arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null, arg6 = null, arg7 = null, arg8 = null):
+			var prev = null
+			var v
+			for v in _values:
+				if _add_result:
+					prev = v.exec(prev, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+				else:
+					prev = v.exec(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+			return prev
+
+
+
+
 	func validate_call_decl(point):
 		#print("point: " + str(point))
 		return (point.aggregate in [ "none", "first", "last", "sequential", "chain" ])
@@ -365,38 +403,21 @@ class CallpointCallback:
 		return "function" in point && ms.object != null && ms.object.has_method(point["function"])
 
 	func convert_type(point, ms):
-		return funcref(ms.object, point['function'])
+		return Exec.new(ms.object, point['function'])
 
 	func aggregate(point, values):
+		if values.empty():
+			return null
 		if point.aggregate == "none" || point.aggregate == "first":
 			return values[0]
 		elif point.aggregate == "last":
 			return values[values.size() - 1]
 		elif point.aggregate == "sequential":
-			var c = Callback(values, false)
-			return funcref(c, "invoke")
+			var c = Callback.new(values, false)
+			return Exec.new(c, "exec")
 		elif point.aggregate == "chain":
-			var c = Callback(values, true)
-			return funcref(c, "invoke")
+			var c = Callback.new(values, true)
+			return Exec.new(c, "exec")
 		else:
 			# invalid
 			return null
-
-
-class Callback:
-	var _values
-	var _add_result
-	
-	func _init(values, add_result):
-		_values = values
-		_add_result = add_result
-	
-	func invoke(args):
-		var prev = null
-		var v
-		for v in _values:
-			if _add_result:
-				prev = v.exec(prev, args)
-			else:
-				prev = v.exec(args)
-		return prev
