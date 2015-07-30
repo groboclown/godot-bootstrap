@@ -43,7 +43,7 @@ func add_all(all_tests):
 func check_true(text, bool_val):
 	if ! bool_val:
 		_current["errors"].append(text)
-		print(_current["name"] + ": " + text)
+		printerr(_current["name"] + ": " + text)
 		print_stack()
 	return (! bool_val) == false
 
@@ -67,7 +67,8 @@ func run():
 		if has_method(t):
 			run_test(t)
 		else:
-			print("*** SETUP ERROR: '" + t + "' not a method")
+			_error_count += 1
+			printerr("*** SETUP ERROR: '" + t + "' not a method")
 	
 	class_teardown()
 	
@@ -83,7 +84,7 @@ func run_test(name):
 	_results[name] = _current
 	if _current["errors"].size() > 0:
 		_error_count += _current["errors"].size()
-		print(filename + "." + name + " failed")
+		printerr(filename + "." + name + " failed")
 
 # -------------------------------------------------------------------------
 

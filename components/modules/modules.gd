@@ -15,6 +15,8 @@ var _extension_point_types = {
 	"path": CallpointPath.new(),
 	"callback": CallpointCallback.new()
 }
+# keep track of the currently active module list.  When a new one
+# is created, the old one is cleaned up / unloaded.
 var _active_modules
 var _loaded = false
 
@@ -33,8 +35,6 @@ var errors = preload("error_codes.gd")
 
 
 
-# TODO keep track of the currently active module list.  When a new one
-# is created, the old one is cleaned up / unloaded.
 
 
 func get_installed_modules():
@@ -367,24 +367,37 @@ class CallpointCallback:
 				if args[i] != null:
 					break
 				args.resize(i)
-			_obj.callv(_name, args)
+			return _obj.callv(_name, args)
+		
 
+	
 	class Callback:
 		var _values
-		var _add_result
+		var _join_type
 		
-		func _init(values, add_result):
+		func _init(values, join_type):
+			# Join Type:
+			#	0: call each one in-order, return the very last value.
+			#   1: call each one in-order, with the result of the previous one as the first argument of the next one
+			#      (initial previous value is null)
+			#   2: call each one in order, put the result inside a list.
 			_values = values
-			_add_result = add_result
+			_join_type = join_type
 		
 		func exec(arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null, arg6 = null, arg7 = null, arg8 = null):
 			var prev = null
+			if _join_type == 2:
+				prev = []
 			var v
 			for v in _values:
-				if _add_result:
-					prev = v.exec(prev, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-				else:
+				if _join_type == 0:
 					prev = v.exec(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+				elif _join_type == 1:
+					prev = v.exec(prev, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+				elif _join_type == 2:
+					prev.append(v.exec(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8))
+				else:
+					prev = null
 			return prev
 
 
@@ -392,7 +405,7 @@ class CallpointCallback:
 
 	func validate_call_decl(point):
 		#print("point: " + str(point))
-		return (point.aggregate in [ "none", "first", "last", "sequential", "chain" ])
+		return (point.aggregate in [ "none", "first", "last", "sequential", "chain", "list" ])
 
 	func validate_implement(point, ms):
 		#print("f: " + point["function"] + ", " + ms.classname)
@@ -413,11 +426,11 @@ class CallpointCallback:
 		elif point.aggregate == "last":
 			return values[values.size() - 1]
 		elif point.aggregate == "sequential":
-			var c = Callback.new(values, false)
-			return Exec.new(c, "exec")
+			return Callback.new(values, 0)
 		elif point.aggregate == "chain":
-			var c = Callback.new(values, true)
-			return Exec.new(c, "exec")
+			return Callback.new(values, 1)
+		elif point.aggregate == "list":
+			return Callback.new(values, 2)
 		else:
 			# invalid
 			return null

@@ -57,12 +57,12 @@ func load_module(module_dir, extension_points):
 	# error, but we won't be able to detect the error from the code.
 	# The best we can manage is detecting an empty set after loading.
 	var metadata = {}
-	metadata.parse_json(contents)
-	if metadata.keys().size() <= 0:
+	err = metadata.parse_json(contents)
+	if err != OK:
 		ret.error_code = ERR_JSON_FORMAT
 		ret.error_operation = "close"
 		ret.error_details = json_path
-		printerr("Could not parse module file " + str(json_path))
+		printerr("Could not parse module file " + str(json_path) + ": " + errors.to_str(err))
 		return ret
 	
 	
@@ -89,8 +89,8 @@ func _process_module(module, md, extension_points):
 	if ! ("version" in md) || typeof(md.version) != TYPE_ARRAY || md.version.size() != 2 || \
 			(typeof(md.version[0]) != TYPE_INT && typeof(md.version[0]) != TYPE_REAL) || \
 			(typeof(md.version[1]) != TYPE_INT && typeof(md.version[1]) != TYPE_REAL):
-		if "version" in md && typeof(md.version) == TYPE_ARRAY:
-			print("version: " + str(md.version.size()) + "; " + str(md.version))
+		#if "version" in md && typeof(md.version) == TYPE_ARRAY:
+		#	print("version: " + str(md.version.size()) + "; " + str(md.version))
 		module.error_code = ERR_MODULE_INVALID_DEFINITION
 		module.error_operation = "process"
 		module.error_details = "version"

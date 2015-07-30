@@ -11,13 +11,12 @@ func activate(extpoints):
 func deactivate():
 	_extpoints = null
 
-func init_game_data(game_data):
-	game_data["player"] = {
+func init_game_data(global_data):
+	global_data["player"] = {
 		"health": 100,
 		"food": 100,
 		"inventory": [],
 		"location": null
 	}
-	
-func init_custom_data():
 	return {}
+

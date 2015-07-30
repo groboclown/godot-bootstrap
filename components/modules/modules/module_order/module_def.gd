@@ -5,6 +5,9 @@ extends HBoxContainer
 # var a=2
 # var b="textvar"
 
+# TODO make the hover color be exported,
+# and loaded from the theme.
+
 var module
 var _model
 var _active
@@ -42,6 +45,7 @@ func _ready():
 
 
 func _draw():
+	# TODO set the color based on the theme
 	var size = get_size()
 	var red = 0.0
 	if module.error_code != OK:

@@ -6,9 +6,11 @@
   
   "calls": {
 	"init/game-data": {
-		"description": "setup the data at start time.  Useful if a module is loaded after a new game is started.  Takes 1 argument - the game data, returns nothing.",
-		"type": "callback",
-		"aggregate": "sequential"
+		"description": "setup the data at start time.  Useful if a module is
+			loaded after a new game is started.  Takes 1 argument - the global game
+			data, returns freshly initialized data for the module.",
+		"type": "module-data-exec",
+		"aggregate": "none"
 	},
 	"init/first-scene": {
 		"description": "The first scene (xscn) file to load for a new game.",
@@ -26,7 +28,7 @@
   
   "implements": {
 	"init/game-data": {
-		"type": "callback",
+		"type": "module-data-exec",
 		"function": "init_game_data"
 	},
 	"init/first-scene": {
