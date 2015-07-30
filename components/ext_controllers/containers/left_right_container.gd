@@ -26,8 +26,6 @@ func _on_resized():
 	var c1 = get_child(1)
 	var c1s = c1.get_size()
 	var min_size = get_minimum_size()
-	min_size.y = max(c0s.y, c1s.y)
-	set_custom_minimum_size(min_size)
 	
 	if right_fixed_width:
 		c0s = _get_opposite_size(size.x, c1, c0)

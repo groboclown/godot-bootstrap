@@ -22,15 +22,6 @@ func get_order():
 
 func _ready():
 	show_modules()
-	
-	# The "h" node must be right below the label, so ensure that's the case.
-	var ln = get_node("Label")
-	ln.connect("minimum_size_changed", self, "_on_label_resized")
-	ln.connect("item_rect_changed", self, "_on_label_resized")
-	ln.connect("resized", self, "_on_label_resized")
-	ln.connect("size_flags_changed", self, "_on_label_resized")
-	
-	_on_label_resized()
 
 
 func show_modules():
@@ -41,7 +32,7 @@ func show_modules():
 	for md in _modules.get_installed_modules():
 		named[md.name] = md
 	
-	var cn = get_node("h/s/v")
+	var cn = get_node("order/h/s/v")
 	var kid
 	for kid in cn.get_children():
 		cn.remove_child(kid)
@@ -121,7 +112,7 @@ func _on_down_pressed():
 func set_selected_module_node(node):
 	_selected_child = node
 	var c
-	for c in get_node("h/s/v").get_children():
+	for c in get_node("order/h/s/v").get_children():
 		c.on_module_selected(node.module)
 
 
@@ -134,7 +125,7 @@ func set_module_active_state(md, active_state):
 func _on_OK_pressed():
 	# Save the order state to options
 	_order = []
-	var cn = get_node("h/s/v")
+	var cn = get_node("order/h/s/v")
 	var kid
 	for kid in cn.get_children():
 		if kid.has_method("is_active_module") && kid.is_active_module():
@@ -155,10 +146,3 @@ func _on_Cancel_pressed():
 func _close_self(accepted):
 	if _close_func != null:
 		_update_obj.call(_close_func, accepted)
-
-
-func _on_label_resized():
-	var ln = get_node("Label")
-	var hn = get_node("h")
-	hn.set_margin(MARGIN_TOP, ln.get_size().y + 4)
-	

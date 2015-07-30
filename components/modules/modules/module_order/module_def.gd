@@ -45,7 +45,6 @@ func _ready():
 
 
 func _draw():
-	# TODO set the color based on the theme
 	var size = get_size()
 	var red = 0.0
 	if module.error_code != OK:
