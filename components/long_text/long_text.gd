@@ -17,9 +17,6 @@ var _line_pos = []
 var _height = 0
 var _changed = false
 
-var _actual_width
-var _minimum_width
-
 const CH_SPACE = 32
 const CH_TAB = 9
 const CH_LF = 13
@@ -40,29 +37,15 @@ func _ready():
 		get_parent().connect("resized", self, "recalculate")
 	if _changed:
 		recalculate()
-	if _actual_width == null:
-		_actual_width = get_minimum_size().x
 
-		
+
 func _on_minimum_changed():
-	var size = get_minimum_size()
-	if _minimum_width == null || size.x != _actual_width:
-		# it hasn't been called, or was explicitly changed outside
-		# of the below method.
-		_minimum_width = size.x
-		if _minimum_width > _actual_width:
-			_actual_width = _minimum_width
-			_changed = true
-		
+	_changed = true
+
 
 func _on_resized():
-	# Prevents the explicit setting of the minimum size below from messing with
-	# the actual size.
-	var new_width = max(get_minimum_size().x, get_size().x)
-	if _actual_width != new_width:
-		_actual_width = new_width
-		_changed = true
-	
+	_changed = true
+
 
 func _draw():
 	if _changed:
@@ -153,19 +136,23 @@ func get_text_font():
 func recalculate():
 	_changed = false
 	
-	var widget_width = _actual_width
+	var widget_width = get_size().x
 	if widget_width == null || widget_width <= 0:
-		if _minimum_width == null:
-			_minimum_width = get_minimum_size().x
-		widget_width = max(get_size().x, _minimum_width)
-	if get_parent() != null && get_parent() extends ScrollContainer:
-		var pw = get_parent().get_size().x
-		if pw > 0:
-			var k = get_parent().get_node("_v_scroll")
-			if k != null:
-				pw -= max(k.get_size().x, 10)
-			if pw < widget_width:
-				widget_width = pw
+		widget_width = max(get_size().x, get_minimum_size().x)
+	if get_parent() != null:
+		if widget_width <= 0:
+			widget_width = get_parent_area_size().x
+		if widget_width <= 0:
+			widget_width = get_parent().get_size().x
+		if get_parent() extends ScrollContainer:
+			var pw = get_parent().get_size().x
+			if pw > 0:
+				var k = get_parent().get_node("_v_scroll")
+				if k != null:
+					pw -= max(k.get_size().x, 10)
+				if pw < widget_width:
+					widget_width = pw
+	print("Using widget width "+str(widget_width))
 	
 	var start_x = 0
 	var fnt = get_text_font()
@@ -259,6 +246,4 @@ func recalculate():
 				wordend_pos = -1
 				linestart_pos = next_linestart
 				
-	set_custom_minimum_size(Vector2(widget_width, y_pos))
-	
-
+	set_custom_minimum_size(Vector2(0, y_pos))
