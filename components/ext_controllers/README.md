@@ -15,6 +15,20 @@ the second node to the right margin).
 
 ![example](left_right_container.png)
 
+Both the `HBoxContainer` and the `left_right_container` give the UI a
+natural, fixed width along with a variable width.  "Natural and fixed" here
+refers to components whose size should not change depending on a change in
+screen size, but have a width that is dictated by internal logic.  For example,
+a `Label` is a fixed size, but can change depending upon the translation of
+the text.
+
+You can think of an `HBoxContainer` as being a *left justified* container,
+whereas a `left_right_container` is a *right justified* container.  The two
+can be used together to create a left and right side of a fixed, natural
+length.
+
+### Using
+
 To add the container into the node tree, add the node as a "Container" type,
 then, at the bottom of the Inspector properties for this new object, select the
 Script **Load** option, and choose
@@ -33,6 +47,8 @@ the first element has its right side aligned on the center, and the second
 element has its left side aligned on the center.
 
 ![example](ok_cancel_swapper.png)
+
+### Using
 
 To add the container into the node tree, add the node as a "Container" type,
 then, at the bottom of the Inspector properties for this new object, select the
