@@ -9,11 +9,13 @@ export var right_fixed_width = true
 
 
 func _ready():
-	connect("minimum_size_changed", self, "_on_resized")
-	connect("item_rect_changed", self, "_on_resized")
-	connect("resized", self, "_on_resized")
-	connect("size_flags_changed", self, "_on_resized")
-	
+	var n
+	for n in [ self, get_child(0), get_child(1) ]:
+		n.connect("minimum_size_changed", self, "_on_resized")
+		n.connect("item_rect_changed", self, "_on_resized")
+		n.connect("resized", self, "_on_resized")
+		n.connect("size_flags_changed", self, "_on_resized")
+
 	_on_resized()
 
 
@@ -34,6 +36,11 @@ func _on_resized():
 	
 	_set_kid_size(c0, c0s, size, pos.x)
 	_set_kid_size(c1, c1s, size, pos.x + size.x - c1s.x)
+	
+	c0s = c0.get_size()
+	c1s = c1.get_size()
+	if size.y != max(c0s.y, c1s.y):
+		set_size(Vector2(size.x, max(c0s.y, c1s.y)))
 
 
 func _set_kid_size(child, child_size, size, width):
