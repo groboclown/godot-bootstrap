@@ -23,8 +23,13 @@ func _on_resized():
 	var pos = get_pos()
 	var mid_x = pos.x + (size.x / 2)
 	var c0 = get_child(0)
-	var c0s = c0.get_size()
 	var c1 = get_child(1)
+	
+	if (c0 == null || c1 == null):
+		print("Null children")
+		return
+	
+	var c0s = c0.get_size()
 	var c1s = c1.get_size()
 	var min_size = get_minimum_size()
 	#min_size.x = size.x

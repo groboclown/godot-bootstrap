@@ -7,6 +7,10 @@ extends Panel
 
 func _ready():
 	# Initialization here
+	var list_container = get_node("SideBySide/SideBySideContainer/s/list")
+	var button_container = get_node("SideBySide/SideBySideContainer/buttons")
+	list_container.connect('selected', self, '_on_line_selected')
+	
 	var menu = get_node("menu/ButtonMenu")
 	menu.set_buttons([
 		{
@@ -50,7 +54,6 @@ func _on_SideBySide_display():
 func _on_BigText_OK_pressed():
 	get_node("BigText").hide()
 
-
 func _on_SideBySide_OK_pressed():
 	get_node("SideBySide").hide()
 
@@ -62,3 +65,31 @@ func _create_show_submenu():
 	
 func _noop():
 	pass
+
+
+func _on_AddListItem_pressed():
+	var list_container = get_node("SideBySide/SideBySideContainer/s/list")
+	var line_count = list_container.get_child_count()
+	var entry = preload("list_entry.xscn").instance()
+	entry.setup(line_count, list_container)
+	list_container.add_child(entry)
+
+
+func _on_UpListItem_pressed():
+	var list_container = get_node("SideBySide/SideBySideContainer/s/list")
+	var node = list_container.get_selected()
+	if node != null:
+		var index = list_container.get_selected_index()
+		list_container.move_child(node, index - 1)
+
+func _on_DownListItem_pressed():
+	var list_container = get_node("SideBySide/SideBySideContainer/s/list")
+	var node = list_container.get_selected()
+	if node != null:
+		var index = list_container.get_selected_index()
+		list_container.move_child(node, index + 1)
+
+func _on_line_selected(entry):
+	var list_container = get_node("SideBySide/SideBySideContainer/s/list")
+	get_node("SideBySide/SideBySideContainer/buttons/UpListItem").set_disabled(list_container.is_first_selected() && list_container.has_selected())
+	get_node("SideBySide/SideBySideContainer/buttons/DownListItem").set_disabled(list_container.is_last_selected() && list_container.has_selected())
