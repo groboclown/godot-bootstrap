@@ -27,12 +27,12 @@ var errors = preload("../error_codes.gd")
 func validate_ordered_modules(ordered_module_structs):
 	# The modules should already be validated on their own (via the loader
 	# and the validate_extensions call).
-	
+
 	var callpoints = {}
 	var incorrect_modules = []
 	var loaded_modules = []
 	var ms
-	
+
 	for ms in ordered_module_structs:
 		if ms.error_code >= ACTIVATION_ERROR_START && ms.error_code <= ACTIVATION_ERROR_END:
 			# re-validate the module
@@ -42,7 +42,7 @@ func validate_ordered_modules(ordered_module_structs):
 		if ms.error_code != OK:
 			incorrect_modules.append(ms)
 			continue
-		
+
 		# Required modules - exist and are in the correct order
 		var lm
 		var req
@@ -74,10 +74,10 @@ func validate_ordered_modules(ordered_module_structs):
 					ms.error_details = req.module
 					incorrect_modules.append(ms)
 				break
-		
+
 		if ms.error_code != OK:
 			continue
-		
+
 		# Extension points: if it is already registered, it matches a registered one.
 		var cpkey
 		for cpkey in ms.extension_points.keys():
@@ -90,10 +90,10 @@ func validate_ordered_modules(ordered_module_structs):
 					break
 			else:
 				callpoints[cpkey] = ms.extension_points[cpkey]
-		
+
 		if ms.error_code != OK:
 			continue
-		
+
 		# Implementation points: the extension is already registered, and they match.
 		for cpkey in ms.implement_points.keys():
 			if cpkey in callpoints:
@@ -109,9 +109,9 @@ func validate_ordered_modules(ordered_module_structs):
 				ms.error_details = cpkey
 				incorrect_modules.append(ms)
 				break
-		
+
 		loaded_modules.append(ms)
-		
+
 	return incorrect_modules
 
 
@@ -123,7 +123,7 @@ func set_modules(ordered_module_structs):
 	_callpoints = {}
 	_modules = ordered_module_structs
 	var wrapper = ModuleWrapper.new(self)
-	
+
 	var ms
 	var cpkey
 	for ms in ordered_module_structs:
@@ -134,14 +134,14 @@ func set_modules(ordered_module_structs):
 					"point": ms.extension_points[cpkey],
 					"impl": []
 				}
-	
+
 		for cpkey in ms.implement_points.keys():
 			_callpoints[cpkey].impl.append(ms)
-		
+
 		var xl
 		for xl in ms.translations:
 			TranslationServer.add_translation(xl)
-		
+
 		if ms.object.has_method("activate") && ms.object.has_method("deactivate"):
 			ms.object.activate(wrapper)
 
@@ -208,9 +208,9 @@ func _init(extension_point_types):
 
 class ModuleWrapper:
 	var _active
-	
+
 	func _init(active):
 		_active = active
-	
+
 	func get_implementation(extension_point_name):
 		return _active.get_value_for(extension_point_name)

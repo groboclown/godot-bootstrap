@@ -14,18 +14,22 @@ const ERR_MODULE_INVALID_IMPLEMENTATION_POINT = 50004
 var errors = preload("../error_codes.gd")
 
 
-func load_module(module_dir, extension_points):
+func load_module(module_dir, extension_points, safe_path = true):
 	# Load the details for a single module based in the given directory.
 	# The returned structure will be a dictionary with information about
 	# the module, including any errors encountered with the load.  It will
 	# not return null.
-	
+
+	# "safe_path": allow for some modules to be marked as "safe" for loading
+	# executable code.  This helps prevent modules from accessing OS.exec,
+	# for example.
+
 	var ret = _create_struct(module_dir)
-	
+
 	var f = File.new()
 	var json_path = module_dir + "/" + MODULE_DESCRIPTION_FILENAME
 	var err = f.open(json_path, File.READ)
-	
+
 	if err != OK:
 		ret.error_code = err
 		ret.error_operation = "open"
@@ -33,7 +37,7 @@ func load_module(module_dir, extension_points):
 		printerr("Could not open module " + str(module_dir) + ": no " + MODULE_DESCRIPTION_FILENAME + " present (" + str(err) + ")")
 		f.close()
 		return ret
-	
+
 	var contents = f.get_as_text()
 	err = f.get_error()
 	if err != OK && err != ERR_FILE_EOF:
@@ -43,7 +47,7 @@ func load_module(module_dir, extension_points):
 		printerr("Could not read module " + str(module_dir) + " (" + str(err) + ")")
 		f.close()
 		return ret
-	
+
 	f.close()
 	err = f.get_error()
 	if err != OK && err != ERR_FILE_EOF && err != ERR_UNCONFIGURED:
@@ -52,7 +56,7 @@ func load_module(module_dir, extension_points):
 		ret.error_details = json_path
 		printerr("Could not close module " + str(module_dir) + " (" + str(err) + ")")
 		return ret
-	
+
 	# If the JSON data is badly formatted, then this will cause a console
 	# error, but we won't be able to detect the error from the code.
 	# The best we can manage is detecting an empty set after loading.
@@ -64,20 +68,20 @@ func load_module(module_dir, extension_points):
 		ret.error_details = json_path
 		printerr("Could not parse module file " + str(json_path) + ": " + errors.to_str(err))
 		return ret
-	
-	
-	_process_module(ret, metadata, extension_points)
+
+
+	_process_module(ret, metadata, extension_points, safe_path)
 	#print(str(ret))
 	return ret
 
 
-func _process_module(module, md, extension_points):
+func _process_module(module, md, extension_points, safe_path):
 	# Processes a loaded module data structure to ensure its validity, and to
 	# extract data from the json file into a usable form.
-	
+
 	# This essentially sanitizes the input data for other parts of the system
 	# to use.
-	
+
 	if ! ("name" in md) || typeof(md.name) != TYPE_STRING:
 		module.error_code = ERR_MODULE_INVALID_DEFINITION
 		module.error_operation = "process"
@@ -85,18 +89,18 @@ func _process_module(module, md, extension_points):
 		return
 	print("Initializing " + md.name)
 	module.name = md.name
-	
+
 	if ! ("version" in md) || typeof(md.version) != TYPE_ARRAY || md.version.size() != 2 || \
 			(typeof(md.version[0]) != TYPE_INT && typeof(md.version[0]) != TYPE_REAL) || \
 			(typeof(md.version[1]) != TYPE_INT && typeof(md.version[1]) != TYPE_REAL):
 		#if "version" in md && typeof(md.version) == TYPE_ARRAY:
-		#	print("version: " + str(md.version.size()) + "; " + str(md.version))
+		#   print("version: " + str(md.version.size()) + "; " + str(md.version))
 		module.error_code = ERR_MODULE_INVALID_DEFINITION
 		module.error_operation = "process"
 		module.error_details = "version"
 		return
 	module.version = [ int(md.version[0]), int(md.version[1]) ]
-	
+
 	if "description" in md:
 		if typeof(md.description) != TYPE_STRING:
 			module.error_code = ERR_MODULE_INVALID_DEFINITION
@@ -104,8 +108,8 @@ func _process_module(module, md, extension_points):
 			module.error_details = "description"
 			return
 		module.description = md.description
-	
-	if "classname" in md:
+
+	if safe_path and "classname" in md:
 		if typeof(md.classname) != TYPE_STRING || md.classname.find("/") >= 0:
 			module.error_code = ERR_MODULE_INVALID_DEFINITION
 			module.error_operation = "process"
@@ -124,9 +128,9 @@ func _process_module(module, md, extension_points):
 		module.error_operation = "process"
 		module.error_details = "classname.new"
 		return
-	
-	
-	
+
+
+
 	if "translations" in md:
 		if typeof(md.translations) != TYPE_ARRAY:
 			module.error_code = ERR_MODULE_INVALID_DEFINITION
@@ -154,9 +158,9 @@ func _process_module(module, md, extension_points):
 				return
 			else:
 				module.translations.append(xl)
-		
-	
-	
+
+
+
 	if "requires" in md:
 		if typeof(md.requires) != TYPE_ARRAY:
 			module.error_code = ERR_MODULE_INVALID_DEFINITION
@@ -194,8 +198,8 @@ func _process_module(module, md, extension_points):
 				r["max"] = int(req["max"])
 			module.requires.append(r)
 			index += 1
-	
-	
+
+
 	if "calls" in md:
 		#print(md.name + ": " + str(md.calls))
 		if typeof(md.calls) != TYPE_DICTIONARY:
@@ -211,7 +215,7 @@ func _process_module(module, md, extension_points):
 				module.error_operation = "process"
 				module.error_details = "calls[" + str(key) + "]"
 				return
-			
+
 			# required values
 			if "description" in val && typeof(val.description) == TYPE_STRING && \
 					"type" in val && typeof(val.type) == TYPE_STRING:
@@ -223,7 +227,7 @@ func _process_module(module, md, extension_points):
 						return
 				else:
 					val["aggregate"] = "none"
-				
+
 				if "order" in val:
 					if typeof(val.order) != TYPE_STRING:
 						module.error_code = ERR_MODULE_INVALID_DEFINITION
@@ -232,13 +236,13 @@ func _process_module(module, md, extension_points):
 						return
 				else:
 					val["order"] = "normal"
-			
+
 			else:
 				module.error_code = ERR_MODULE_INVALID_DEFINITION
 				module.error_operation = "process"
 				module.error_details = "calls[" + str(key) + "]"
 				return
-			
+
 			if ! (val.type in extension_points):
 				module.error_code = ERR_MODULE_INVALID_EXTENSION_POINT
 				module.error_operation = "process"
@@ -249,9 +253,9 @@ func _process_module(module, md, extension_points):
 				module.error_operation = "process"
 				module.error_details = "calls[" + key + "]"
 				return
-			
+
 			#print(" - " + key)
-			
+
 			module.extension_points[key] = {
 				"description": val.description,
 				"type": val.type,
@@ -259,9 +263,9 @@ func _process_module(module, md, extension_points):
 				"order": val.order
 			}
 	#else:
-	#	print("!!! no 'calls' in " + str(md))
-	
-	
+	#   print("!!! no 'calls' in " + str(md))
+
+
 	if "implements" in md:
 		if typeof(md.implements) != TYPE_DICTIONARY:
 			module.error_code = ERR_MODULE_INVALID_DEFINITION
@@ -271,20 +275,20 @@ func _process_module(module, md, extension_points):
 		var key
 		for key in md.implements.keys():
 			var val = md.implements[key]
-			
+
 			if typeof(key) != TYPE_STRING || typeof(val) != TYPE_DICTIONARY:
 				module.error_code = ERR_MODULE_INVALID_DEFINITION
 				module.error_operation = "process"
 				module.error_details = "implements[" + str(key) + "]"
 				return
-			
+
 			# required values
 			if ! ("type" in val) || typeof(val.type) != TYPE_STRING:
 				module.error_code = ERR_MODULE_INVALID_DEFINITION
 				module.error_operation = "process"
 				module.error_details = "implements[" + str(key) + "][type]"
 				return
-			
+
 			if ! (val.type in extension_points):
 				module.error_code = ERR_MODULE_INVALID_IMPLEMENTATION_POINT
 				module.error_operation = "process"
@@ -295,7 +299,7 @@ func _process_module(module, md, extension_points):
 				module.error_operation = "process"
 				module.error_details = "implements[" + str(key) + "][type]"
 				return
-			
+
 			module.implement_points[key] = { "type": val.type }
 
 			var k2
@@ -310,9 +314,9 @@ func _process_module(module, md, extension_points):
 					module.error_operation = "process"
 					module.error_details = "implements[" + str(key) + "][" + str(k2) + "]"
 					return
-				
+
 				module.implement_points[key][k2] = val[k2]
-	
+
 	#print("md: " + str(md) + "; module: " + str(module))
 
 

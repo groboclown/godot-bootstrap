@@ -157,6 +157,9 @@ out when `deactivate` is called.
 The class object is also used for `callback` extension points, and is available
 for custom extension point types to use.
 
+The class will be created using a simple `new()` operation, so any `_init()`
+function on the class *must* have zero arguments.
+
 #### translations - `[ String, ... ]`, optional
 
 An array of translation files that this module uses.  These names are relative

@@ -29,8 +29,8 @@ const MAGIC_NUMBER = 3735928559
 
 func _init(metadata_handler):
 	_metadata_handler = metadata_handler
-	
-	
+
+
 func is_loaded():
 	return _data != null
 
@@ -54,7 +54,7 @@ func get_module_names():
 
 func is_initialized():
 	return _filename != null
-	
+
 
 # -----------------------------------------------------------------------------
 # Setup
@@ -91,10 +91,10 @@ func load_header():
 	# Load just the header data from the file.
 	var f = _metadata_handler.open_file(_filename, File.READ)
 	var err = _read_header(f)
-	
+
 	f.close()
 	_metadata_handler.close_file(_filename, File.READ)
-	
+
 	return err
 
 
@@ -104,10 +104,10 @@ func load_data():
 	var err = _read_header(f)
 	if err != OK:
 		err = _read_data(f)
-	
+
 	f.close()
 	_metadata_handler.close_file(_filename, File.READ)
-	
+
 	return err
 
 
@@ -116,10 +116,10 @@ func write_data():
 	var err = _write_header(f)
 	if err == OK:
 		err = _write_data(f)
-	
+
 	f.close()
 	_metadata_handler.close_file(_filename, File.WRITE)
-	
+
 	return err
 
 
@@ -144,7 +144,7 @@ func replace_data_for_module(module_name, data):
 
 
 # ----------------------------------------------------------------------------
-# 
+#
 
 func _write_header(f):
 	if f.get_error() != OK:
@@ -153,12 +153,12 @@ func _write_header(f):
 	f.store_32(MAGIC_NUMBER)
 	if f.get_error() != OK:
 		return f.get_error()
-	
+
 	var mod_md = []
 	var mod
 	for mod in _module_metadata.keys():
 		mod_md.append([ mod, _module_metadata[mod] ])
-	
+
 	var header_data = {
 		"d": _savedate["day"],
 		"M": _savedate["month"],
@@ -170,11 +170,11 @@ func _write_header(f):
 		"n": _name,
 		"o": mod_md
 	}
-	
+
 	f.store_var(header_data)
 	if f.get_error() != OK:
 		return f.get_error()
-	
+
 	return OK
 
 
@@ -189,18 +189,18 @@ func _read_header(f):
 		return f.get_error()
 	if magic != MAGIC_NUMBER:
 		return ERR_FILE_UNRECOGNIZED
-	
+
 	var header_data = f.get_var()
 	if f.get_error() != OK && f.get_error() != ERR_FILE_EOF:
 		return f.get_error()
 	if header_data == null || typeof(header_data) != TYPE_DICTIONARY:
 		return ERR_FILE_CORRUPT
-	
+
 	var date = {}
 	var time = {}
 	var name = null
 	var module_metadata = {}
-	
+
 	if "d" in header_data && typeof(header_data["d"]) == TYPE_REAL:
 		date["day"] = int(header_data["d"])
 	else:
@@ -240,36 +240,36 @@ func _read_header(f):
 				module_metadata[mod[0]] = int(mod[1])
 			else:
 				return ERR_FILE_CORRUPT
-	
+
 	# Header is now read and mostly validated.
-	
+
 	var err = _metadata_handler.validate_modules(module_metadata)
 	if err != OK:
 		return err
-	
+
 	# Header is fully validated
-	
+
 	_module_metadata = module_metadata
 	_name = name
 	_savetime = time
 	_savedate = date
-	
+
 	return OK
 
 
 
 # ----------------------------------------------------------------------------
-# 
+#
 
 func _write_data(f):
 	# Caller must close the file.
-	
+
 	if _data == null:
 		return ERR_INVALID_DATA
 
 	if f.get_error() != OK:
 		return f.get_error()
-	
+
 	var modname
 	for modname in _module_metadata.keys():
 		if modname in _data:
@@ -283,10 +283,10 @@ func _write_data(f):
 
 func _read_data(f):
 	# Caller must close the file.
-	
+
 	if f.get_error() != OK:
 		return f.get_error()
-	
+
 	var data = {}
 	while f.get_error() == OK:
 		var r = f.get_var()
@@ -298,12 +298,12 @@ func _read_data(f):
 		if x[0] != OK:
 			return x[0]
 		data[r.m] = x[1]
-	
+
 	# All the data is read and validated.  The data should also be upgraded
 	# to the current version of the module data.
-	
-	
-	
+
+
+
 	if f.get_error() == ERR_FILE_EOF:
 		return OK
 	return f.get_error()

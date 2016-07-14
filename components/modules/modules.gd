@@ -15,9 +15,6 @@ var _extension_point_types = {
 	"path": CallpointPath.new(),
 	"callback": CallpointCallback.new()
 }
-# keep track of the currently active module list.  When a new one
-# is created, the old one is cleaned up / unloaded.
-var _active_modules
 var _loaded = false
 
 
@@ -54,15 +51,10 @@ func get_invalid_modules():
 
 
 func create_active_module_list(module_names, progress = null):
-	if _active_modules == null:
-		_active_modules = preload("modules/active.gd").new(_extension_point_types)
 	return OrderedModules.new(self, module_names, progress)
 
 
 func add_extension_point_type(type_name, type_obj):
-	if _active_modules != null:
-		print("ERROR Can only be called before create_active_module_list is called.")
-		return
 	if type_name == null || typeof(type_name) != TYPE_STRING || type_name in _extension_point_types:
 		print("ERROR Bad type name: " + str(type_name))
 		return
@@ -122,12 +114,12 @@ func load_modules(module_paths, progress = null):
 		return
 	print("Initializing modules")
 	_last_module_paths = module_paths
-	
+
 	# Create a child-able progress listener, to allow for flexibility and
 	# avoiding null checks.
 	progress = preload("progress_listener.gd").new(progress)
 	progress.set_value(0.0)
-	
+
 	var module_dirs = []
 	var path
 	var cprog = progress.create_child(0.0, 0.4)
@@ -137,7 +129,7 @@ func load_modules(module_paths, progress = null):
 		_find_modules_for(path, module_dirs)
 		index += 1
 		cprog.set_value(index)
-	
+
 	cprog = progress.create_child(0.4, 1.0)
 	cprog.set_steps(module_dirs.size() * 2)
 	index = 0
@@ -146,11 +138,11 @@ func load_modules(module_paths, progress = null):
 		var config = loader.load_module(mod_dir, _extension_point_types)
 		cprog.set_value(index)
 		index += 1
-		
+
 		_defined_modules.append(config)
 		cprog.set_value(index)
 		index += 1
-	
+
 	_initialized = true
 	_loaded = false
 
@@ -167,8 +159,8 @@ func _find_modules_for(path, module_dirs):
 	# scanning.
 	if _initialized:
 		return
-	
-	
+
+
 	var ftest = File.new()
 	var f = File.new()
 	var err = f.open(path.plus_file(MODULE_LIST_FILENAME), File.READ)
@@ -199,8 +191,8 @@ func _find_modules_for(path, module_dirs):
 	f.close()
 	ftest.close()
 
-	
-	
+
+
 
 # ---------------------------------------------------------------------------
 
@@ -209,15 +201,17 @@ class OrderedModules:
 	var _invalid = []
 	var _order = []
 	var _modobj
-	
+    var _active_modules
+
 	func _init(module_obj, module_names, progress):
 		# Takes the list of module names, and sets them as the current order of
-		# the underlying `_active_modules` object
+		# the `_active_modules` object
 		_modobj = module_obj
-		
+		_active_modules = preload("modules/active.gd").new(_modobj._extension_point_types)
+
 		progress = preload("progress_listener.gd").new(progress)
 		progress.set_value(0.0)
-		
+
 		var loader = preload("modules/loader.gd").new()
 		var order = []
 		var name
@@ -236,18 +230,16 @@ class OrderedModules:
 				md.error_operation = "order"
 				md.error_details = name
 				order.append(md)
-		
-		_invalid = module_obj._active_modules.validate_ordered_modules(order)
+
+		_invalid = _active_modules.validate_ordered_modules(order)
 		if _invalid.empty():
-			module_obj._active_modules.set_modules(order)
+			_active_modules.set_modules(order)
 		else:
-			module_obj._active_modules.set_modules([])
-		
-		return _invalid
-	
+			_active_modules.set_modules([])
+
 	func get_implementation(extension_point_name):
-		return _modobj._active_modules.get_value_for(extension_point_name)
-		
+		return _active_modules.get_value_for(extension_point_name)
+
 	func is_valid():
 		return _invalid.empty()
 
@@ -256,7 +248,7 @@ class OrderedModules:
 		return _invalid
 
 	func get_active_modules():
-		return _modobj._active_modules.get_active_modules()
+		return _active_modules.get_active_modules()
 
 
 # ---------------------------------------------------------------------------
@@ -288,7 +280,7 @@ class CallpointString:
 
 	func aggregate(point, values):
 		values = _join_array_of_arrays(values, point.order)
-		
+
 		if point.aggregate == "none" || point.aggregate == "first":
 			return values[0]
 		elif point.aggregate == "last":
@@ -325,11 +317,11 @@ class CallpointString:
 			list.sort()
 			list.invert()
 		return list
-			
+
 
 class CallpointPath:
 	extends CallpointString
-	
+
 	func _init():
 		val_name = "path"
 
@@ -356,11 +348,11 @@ class CallpointCallback:
 	class Exec:
 		var _name
 		var _obj
-		
+
 		func _init(obj, name):
 			_name = name
 			_obj = obj
-		
+
 		func exec(arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null, arg6 = null, arg7 = null, arg8 = null, arg9 = null):
 			var args = [ arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 ]
 			for i in range(9, 0, -1):
@@ -368,22 +360,22 @@ class CallpointCallback:
 					break
 				args.resize(i)
 			return _obj.callv(_name, args)
-		
 
-	
+
+
 	class Callback:
 		var _values
 		var _join_type
-		
+
 		func _init(values, join_type):
 			# Join Type:
-			#	0: call each one in-order, return the very last value.
+			#   0: call each one in-order, return the very last value.
 			#   1: call each one in-order, with the result of the previous one as the first argument of the next one
 			#      (initial previous value is null)
 			#   2: call each one in order, put the result inside a list.
 			_values = values
 			_join_type = join_type
-		
+
 		func exec(arg0 = null, arg1 = null, arg2 = null, arg3 = null, arg4 = null, arg5 = null, arg6 = null, arg7 = null, arg8 = null):
 			var prev = null
 			if _join_type == 2:
@@ -410,9 +402,9 @@ class CallpointCallback:
 	func validate_implement(point, ms):
 		#print("f: " + point["function"] + ", " + ms.classname)
 		#if ms.object != null:
-		#	print("   " + str(ms.object.has_method(point["function"])))
+		#   print("   " + str(ms.object.has_method(point["function"])))
 		#else:
-		#	print("   obj is null")
+		#   print("   obj is null")
 		return "function" in point && ms.object != null && ms.object.has_method(point["function"])
 
 	func convert_type(point, ms):
