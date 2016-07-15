@@ -153,7 +153,7 @@ class ModuleLoadOrderSave:
 	func is_compatible_with(version_number):
 		return version == version_number
 	
-	func create_data():
+	func create_data(memory):
 		return _module_list
 	
 	func read_data(version, disk_data):
@@ -183,10 +183,10 @@ class ModuleSaveDef:
 			return _module.object.is_compatible_with(version_number)
 		return version == version_number
 	
-	func create_data():
+	func create_data(memory):
 		if _module.object != null && _module.object.has_method("create_data"):
-			return _module.object.create_data()
-		return {}
+			return _module.object.create_data(memory)
+		return memory
 	
 	func read_data(version, disk_data):
 		if _module.object != null && _module.object.has_method("read_data"):
@@ -206,8 +206,8 @@ class NonModuleSaveDef:
 	func is_compatible_with(version_number):
 		return version == version_number
 	
-	func create_data():
-		return {}
+	func create_data(memory):
+		return memory
 	
 	func read_data(version, disk_data):
 		return [ OK, disk_data ]

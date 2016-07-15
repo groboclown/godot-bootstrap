@@ -4,11 +4,11 @@
 # front-end.
 
 # A "module" is an object with the following attributes:
-#	"name": String (ro)
-#	"version": int (ro)
-#	"is_compatible_with": func(version_number):bool
-#	"create_data": func(raw_data):Variant
-#	"read_data": func(version, disk_data):[ ErrorCode, Variant ]
+#   "name": String (ro)
+#   "version": int (ro)
+#   "is_compatible_with": func(version_number):bool
+#   "create_data": func(raw_data):Variant
+#   "read_data": func(version, disk_data):[ ErrorCode, Variant ]
 
 # Public variables.  Note possible bug when creating the directory.
 var savedir = "user://"
@@ -75,12 +75,16 @@ func discover_saves(reload_cache = false):
 					_saves[file_name] = info.get_header()
 				else:
 					# TODO report which file had the problem
-					dir.list_dir_end()
-					return err
+					pass
+					# But we DO NOT just give up.  We have an invalid save file,
+					# and that won't be included in our list of valid saves.
+					# dir.list_dir_end()
+					# return err
+					print("Ignoring save file " + full_name + " " + str(err))
 			file_name = dir.get_next()
 		dir.list_dir_end()
 		return OK
-	
+
 
 
 func delete_save(filename):
@@ -105,7 +109,7 @@ func delete_save(filename):
 	return save_listfile()
 
 
-	
+
 # ----------------------------------------------------------------------------
 # Setup functions
 
@@ -126,7 +130,7 @@ func clear_modules():
 
 # ---------------------------------------------------------------------------
 # Used by save_data.gd
-	
+
 
 func get_module_defs():
 	return _modules
@@ -135,16 +139,20 @@ func get_module_defs():
 func open_file(filename, mode):
 	# Returns the file object (opened for reading).
 	# It should be queried for an error before using (.get_error()).
-	
-	if ! (filename in _saves):
-		# An unknown save file
-		return FakeFile.new(ERR_CANT_OPEN)
-	
+
+	#if ! (filename in _saves):
+	#   # An unknown save file
+	#   return FakeFile.new(ERR_CANT_OPEN)
+
 	var err = _ensure_savedir_exists()
 	if err != OK:
 		return FakeFile.new(err)
-	var file_path = savedir.plus_file(filename)
-	
+	var file_path = filename
+	# TODO ensure that this is only ever called just one way, so that this
+	# check isn't needed.
+	if file_path.find("://") < 0:
+		file_path = savedir.plus_file(filename)
+
 	var f = File.new()
 	if do_encryption && encryption_key != null:
 		err = f.open_encrypted_with_pass(file_path, mode, encryption_key)
@@ -153,6 +161,8 @@ func open_file(filename, mode):
 		err = f.open(file_path, mode)
 		#print("open normal "+file_path+"/"+str(mode))
 	#print("error on open? " + str(err))
+	if err != OK:
+		return FakeFile.new(err)
 	return f
 
 
@@ -187,7 +197,7 @@ func create_saved_data(module_name, module_data):
 	# data includes the version number that was saved.
 	return [ _modules[module_name].version, _modules[module_name].create_data(module_data) ]
 
-	
+
 func close_file(filename, mode):
 	# update the list file
 	if mode == File.WRITE:
@@ -219,7 +229,7 @@ func new_save(save_name):
 		if testf.file_exists(fname):
 			continue
 		break
-	
+
 	_saves[fname] = {
 		"file": fname,
 		"name": save_name,
@@ -277,17 +287,17 @@ func _dir_exists(dirname):
 		return true
 	# should be able to find it with list_dir
 	return false
-	
+
 
 class FakeFile:
 	var error
-	
+
 	func _init(err):
 		error = err
-	
+
 	func get_error():
 		return error
-	
+
 	func close():
 		pass
-	
+

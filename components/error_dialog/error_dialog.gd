@@ -9,15 +9,13 @@ export var parent_margin_y = 80
 func show_warning(node, title, error_type, details, callback = null):
 	set_title(title)
 	warning(error_type, details, node, callback)
-	node.add_child(self)
-	popup_centered(Vector2(node.get_size().x - parent_margin_x, node.get_size().y - parent_margin_y))
+	_add_to_center(node)
 
 
 func show_unrecoverable_error(node, title, error_type, details):
 	set_title(title)
 	unrecoverable_error(error_type, details)
-	node.add_child(self)
-	popup_centered(Vector2(node.get_size().x - parent_margin_x, node.get_size().y - parent_margin_y))
+	_add_to_center(node)
 
 
 func unrecoverable_error(error_type, details):
@@ -67,3 +65,9 @@ func _on_failure_confirmed():
 		if _callback_obj != null && _callback_func != null && _callback_obj.has_method(_callback_func):
 			_callback_obj.call(_callback_func)
 
+
+func _add_to_center(node):
+	var view = node.get_tree().get_root()
+	view.add_child(self)
+	var size = view.get_rect().size
+	popup_centered(Vector2(size.x - parent_margin_x, size.y - parent_margin_y))

@@ -201,7 +201,7 @@ class OrderedModules:
 	var _invalid = []
 	var _order = []
 	var _modobj
-    var _active_modules
+	var _active_modules
 
 	func _init(module_obj, module_names, progress):
 		# Takes the list of module names, and sets them as the current order of

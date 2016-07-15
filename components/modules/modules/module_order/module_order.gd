@@ -31,7 +31,7 @@ func show_modules():
 	var named = {}
 	for md in _modules.get_installed_modules():
 		named[md.name] = md
-	
+
 	var cn = get_node("order/h/s/v")
 	var kid
 	for kid in cn.get_children():
@@ -57,9 +57,9 @@ func _on_Refresh_pressed():
 		var progress = get_node("v/h2/RefreshProgress")
 		progress.show()
 		_modules.reload_modules(null, progress)
-	
+
 		show_modules()
-	
+
 		progress.hide()
 
 
@@ -77,10 +77,10 @@ func _on_up_pressed():
 				pos = index
 			p.remove_child(k)
 			index += 1
-		
+
 		kids.remove(pos)
 		kids.insert(max(0, pos - 1), _selected_child)
-		
+
 		for k in kids:
 			p.add_child(k)
 
@@ -98,13 +98,13 @@ func _on_down_pressed():
 				pos = index
 			p.remove_child(k)
 			index += 1
-		
+
 		kids.remove(pos)
 		if pos >= kids.size():
 			kids.append(_selected_child)
 		else:
 			kids.insert(pos + 1, _selected_child)
-		
+
 		for k in kids:
 			p.add_child(k)
 
@@ -132,9 +132,9 @@ func _on_OK_pressed():
 			var md = kid.module
 			#_order.append([ md.name, md.version ])
 			_order.append(md.name)
-	
+
 	_update_obj.call(_update_func, _order)
-	
+
 	# remove ourself
 	_close_self(true)
 

@@ -71,6 +71,9 @@ func create_new(save_name):
 	_savetime = md.time
 	_savedate = md.date
 	_data = {}
+	var name
+	for name in get_module_names():
+		_data[name] = {}
 	return write_data()
 
 
