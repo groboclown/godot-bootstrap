@@ -16,6 +16,7 @@ var _trtext
 var _line_pos = []
 var _height = 0
 var _changed = false
+var _actual_width = 0
 
 const CH_SPACE = 32
 const CH_TAB = 9
@@ -135,7 +136,7 @@ func get_text_font():
 
 func recalculate():
 	_changed = false
-	
+
 	var widget_width = get_size().x
 	if widget_width == null || widget_width <= 0:
 		widget_width = max(get_size().x, get_minimum_size().x)
@@ -152,8 +153,8 @@ func recalculate():
 					pw -= max(k.get_size().x, 10)
 				if pw < widget_width:
 					widget_width = pw
-	print("Using widget width "+str(widget_width))
-	
+	# print("Using widget width "+str(widget_width))
+
 	var start_x = 0
 	var fnt = get_text_font()
 	var font_height = float(fnt.get_height())
@@ -203,7 +204,7 @@ func recalculate():
 				_line_pos.append([
 					# text
 					txt.right(linestart_pos),
-					
+
 					# draw position
 					Vector2(x_pos, y_pos)
 				])
@@ -228,16 +229,16 @@ func recalculate():
 					next_wordstart = tpos
 					word_width = cw
 					next_word_width = cw
-				
+
 				# soft end of line
 				_line_pos.append([
 					# text
 					txt.substr(linestart_pos, wordend_pos - linestart_pos),
-					
+
 					# draw position
 					Vector2(x_pos, y_pos)
 				])
-				
+
 				x_pos = start_x
 				width = word_width
 				word_width = next_word_width
@@ -245,5 +246,5 @@ func recalculate():
 				wordstart_pos = next_wordstart
 				wordend_pos = -1
 				linestart_pos = next_linestart
-				
+
 	set_custom_minimum_size(Vector2(0, y_pos))

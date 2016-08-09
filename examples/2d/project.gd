@@ -10,7 +10,7 @@ func _ready():
 	var list_container = get_node("SideBySide/SideBySideContainer/s/list")
 	var button_container = get_node("SideBySide/SideBySideContainer/buttons")
 	list_container.connect('selected', self, '_on_line_selected')
-	
+
 	var menu = get_node("menu/ButtonMenu")
 	menu.set_buttons([
 		{
@@ -62,7 +62,7 @@ func _create_show_submenu():
 	for i in range(0, 15):
 		ret.append({ "name": "show " + str(i), "obj": self, "func": "_noop" })
 	return ret
-	
+
 func _noop():
 	pass
 

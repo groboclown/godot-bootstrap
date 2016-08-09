@@ -1,10 +1,9 @@
 # Godot Bootstrap
 
-*Godot Bootstrap* provides basic components to make setting up an
-initial [Godot](//http://www.godotengine.org)
-game much faster, by providing much of the boiler plate code to get you
-started.  Best of all, you can decide which components to use, and which
-to ignore.
+*Godot Bootstrap* provides basic components to make setting up an initial
+[Godot](http://www.godotengine.org) game much faster, by providing much of
+the boiler plate code to get you started.  Best of all, you can decide which
+components to use, and which to ignore.
 
 
 
@@ -44,12 +43,12 @@ config = {
 	# or you'll need a custom build system to move them there.
 	# If this isn't given, it defaults to "bootstrap".
 	bootstrap: "game/boostrap",
-	
+
 	# All the components that the project uses.  These will be copied into the
 	# bootstrap directory.  If a component depends upon another component, those
 	# will be added implicitly (you don't need to reference it).
 	components: [ unit_tests, error_codes ],
-	
+
 	# If you want to map the bootstrap file categories to a different location,
 	# this gives you that flexibility.  See each component for the categories
 	# it uses, and for whether directory remapping is supported.
@@ -81,6 +80,3 @@ GitHub project for pull requests your local changes.  Be sure to have a
 look at the [development guide](docs/developing.md) for coding standards.
 
 All contributions must be made available under the [CC0](LICENSE) license.
-
-
-

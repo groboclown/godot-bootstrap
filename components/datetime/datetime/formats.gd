@@ -18,6 +18,7 @@ static func date_values(ret, date):
 	ret['y'] = stringfunc.pad_number(int(date.year) % 100)
 	ret['Y'] = str(int(date.year))
 	ret['d'] = stringfunc.pad_number(int(date.day))
+	ret['D'] = str(int(date.day))
 	ret['m'] = stringfunc.pad_number(int(date.month))
 	ret['w'] = str(int(date.weekday))
 	ret['a'] = tr(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][int(date.weekday)])
@@ -43,7 +44,7 @@ static func time_values(ret, time):
 	else:
 		ampm = 'PM'
 		hour12 = hour - 12
-	
+
 	ret['I'] = stringfunc.pad_number(hour12)
 	ret['H'] = stringfunc.pad_number(hour)
 	ret['M'] = stringfunc.pad_number(int(time.minute))

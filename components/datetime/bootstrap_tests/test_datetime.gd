@@ -1,5 +1,5 @@
 
-# 
+#
 
 
 extends "../base.gd"
@@ -24,14 +24,13 @@ func test_date_padding():
 		'day': 5, 'dst': true, 'month': 3, 'weekday': 6, 'year': 1900
 	}
 	check_that("date_to_str", datetime.date_to_str("@%y.%Y/%d,%m-%w%%%a^%A$%b*%B+", date), is("@00.1900/05,03-6%Sat^Saturday$Mar*March+"))
-	check_that("should fail", 1, is(2))
 
 func test_date_nopadding():
 	var date = {
 		'day': 13, 'dst': false, 'month': 12, 'weekday': 6, 'year': 2013
 	}
 	check_that("date_to_str", datetime.date_to_str("@%y.%Y/%d,%m-%b*%B+", date), is("@13.2013/13,12-Dec*December+"))
-	
+
 func test_time_12am():
 	var time = {
 		'hour': 0, 'minute': 12, 'second': 59
@@ -56,7 +55,7 @@ func test_time_pm():
 		'hour': 13, 'minute': 0, 'second': 60
 	}
 	check_that("time_to_str", datetime.time_to_str("%I:%H:%M:%S@%p-", time), is("01:13:00:60@PM-"))
-	
+
 func test_datetime():
 	pass
 

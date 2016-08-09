@@ -9,7 +9,7 @@ func _init():
 	var tests = find_tests_from_dir(TEST_SOURCES)
 	run_tests(tests)
 	quit()
-	
+
 
 func find_tests_from_dir(path):
 	#print("Finding in " + path)
@@ -35,7 +35,7 @@ func find_tests_from_dir(path):
 	dir.list_dir_end()
 	return ret
 
-	
+
 func run_tests(tests):
 	for test in tests:
 		var test_instance = create_test(test)

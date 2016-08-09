@@ -33,10 +33,11 @@ formatting language, specifically:
  * *%y* - last 2 digits of the year.
  * *%Y* - full year.
  * *%d* - 0-padded 2 digit day of the month.
+ * *%D* - day of the month.
  * *%m* - 0-padded 2 digit month.
  * *%w* - weekday index (Sunday is index 0).
- * *%a% - 3-character day of week (`Sun`, `Mon`, ..., `Sat`)
- * *%A% - Full name of the day of the week (`Sunday`, `Monday`, ..., `Saturday`)
+ * *%a* - 3-character day of week (`Sun`, `Mon`, ..., `Sat`)
+ * *%A* - Full name of the day of the week (`Sunday`, `Monday`, ..., `Saturday`)
  * *%b* - 3-character month name (`Jan`, `Feb`, ..., `Dec`)
  * *%B* - Full name of the month (`January`, `February`, ..., `December`)
  
@@ -86,3 +87,8 @@ given format.  Unlike the other conversion functions, this does not allow for
 print("Current time and date: " + DATETIME.datetime_to_str("%B, %A %d, %Y %I:%M:%S %p"))
 ```
 
+### func `date_add(DateDict::date, int::days)`
+
+Adds the number of days to the `date` dictionary, and returns a new `DateDict`
+corresponding to the advanced day count.  Subtraction of days is done by passing
+in a negative `days` value.
