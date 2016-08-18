@@ -2,11 +2,17 @@
 
 #extends Object
 
-var _results = {}
-var _current = null
-var _error_count = 0
 var _tests = []
 var filename = "<unknown>"
+var _results = null
+
+func _init():
+	var t
+	for t in get_method_list():
+		# print(t.to_json())
+		if t["name"].begins_with("test_") && t["args"].size() <= 0:
+			add(t["name"])
+
 
 func class_setup():
 	pass
@@ -28,13 +34,36 @@ func teardown():
 
 
 func add(test_name):
-	_tests.append(test_name)
+	if test_name == null:
+		return
+	if typeof(test_name) == TYPE_STRING:
+		if not(test_name in _tests):
+			_tests.append(test_name)
+	else:
+		var t
+		for t in test_name:
+			if t != null && not(t in _tests):
+				_tests.append(t)
 
 
 func add_all(all_tests):
-	var t
-	for t in all_tests:
-		add(t)
+	add(all_tests)
+
+
+func set_tests(test_names):
+	_tests = []
+	add(test_names)
+
+
+func skip(test_name):
+	if test_name == null:
+		return
+	if typeof(test_name) == TYPE_STRING:
+		_tests.erase(test_name)
+	else:
+		var t
+		for t in test_name:
+			_tests.erase(test_name)
 
 
 # ------------------------------------------------------------------------
@@ -42,49 +71,58 @@ func add_all(all_tests):
 
 func check_true(text, bool_val):
 	if ! bool_val:
-		_current["errors"].append(text)
-		printerr(_current["name"] + ": " + text)
-		print_stack()
-	return (! bool_val) == false
+		if _results != null:
+			_results.add_error(text)
+		return false
+	return true
 
 func check_that(text, actual, matcher):
 	return check_true(text + ": " + matcher.describe(actual), matcher.matches(actual))
+
+func check(text = ""):
+	return Checker.new(results, text)
 
 
 
 
 # ------------------------------------------------------------------------
 
+# result_collector must implement these methods:
+#   func start_suite(suite_name)
+#   func end_suite()
+#   func start_test(name)
+#   func end_test()
+#   func add_error(message)
+#   func has_errors() (does the current suite have any errors?)
 
-func run():
-	_results = {}
-	_error_count = 0
 
+func run(result_collector):
+	self._results = result_collector
+	result_collector.start_suite(filename)
 	class_setup()
+	if result_collector.has_error():
+		return
 
 	var t
 	for t in _tests:
 		if has_method(t):
-			run_test(t)
+			run_test(t, result_collector)
 		else:
-			_error_count += 1
-			printerr("*** SETUP ERROR: '" + t + "' not a method")
+			result_collector.add_error("Setup Error: requested function does not exist: " + t)
 
 	class_teardown()
-
-	return _error_count
+	result_collector.end_suite()
 
 
 func run_test(name):
-	print("Running " + filename + "." + name)
-	_current = { "name": name, "errors": [] }
+	if _results != null:
+		_results.start_test(name)
 	setup()
 	call(name)
 	teardown()
-	_results[name] = _current
-	if _current["errors"].size() > 0:
-		_error_count += _current["errors"].size()
-		printerr(filename + "." + name + " failed")
+	if _results != null:
+		_results.end_test()
+
 
 # -------------------------------------------------------------------------
 
@@ -101,7 +139,11 @@ class Matcher:
 			return value.to_json()
 		return "[" + str(value) + "]"
 	func _is_list(value):
-		return typeof(value) == TYPE_ARRAY || typeof(value) == TYPE_INT_ARRAY || typeof(value) == TYPE_REAL_ARRAY || typeof(value) == TYPE_STRING_ARRAY
+		# return typeof(value) == TYPE_ARRAY || typeof(value) == TYPE_INT_ARRAY || typeof(value) == TYPE_REAL_ARRAY || typeof(value) == TYPE_STRING_ARRAY
+		# All the arrays are in this specific range.
+		# This needs to be checked against future versions of Godot.
+		var v = typeof(value)
+		return v >= TYPE_ARRAY && v <= TYPE_COLOR_ARRAY
 
 
 class IsMatcher:
@@ -226,3 +268,82 @@ class NearMatcher:
 
 static func near(val, epsilon = 0.00001):
 	return NearMatcher.new(val, epsilon)
+
+
+class ContainsMatcher:
+	extends Matcher
+	var _val
+
+	func _init(val):
+		_val = val
+
+	func matches(expected):
+		if expected == null:
+			return false
+		if typeof(expected) == TYPE_STRING:
+			# Expect a string to contain a sub-string
+			return expected.find(_val) >= 0
+		if _is_list(expected):
+			if _is_list(_val):
+				# each "val" must be in the expected list
+				var v
+				for v in _val:
+					if ! (v in expected):
+						return false
+				return true
+			return _val in expected
+		if typeof(expected) == TYPE_RECT2:
+			if typeof(_val) == TYPE_RECT2:
+				return expected.encloses(_val)
+			if typeof(_val) == TYPE_VECTOR2:
+				return expected.has_point(_val)
+			return false
+		if typeof(expected) == TYPE_PLANE:
+			if typeof(_val) == TYPE_VECTOR3:
+				return expected.has_point(_val)
+			return false
+		if typeof(actual) == TYPE_DICTIONARY:
+			if _is_list(_val):
+				return actual.has_all(_val)
+		 	return actual.has(_val)
+
+
+		# These don't really make sense.
+
+		# Object values should just be checked for equality.
+		#if typeof(actual) == TYPE_OBJECT:
+		#	return actual.get(_val) != null
+
+		return false
+
+	func describe(actual):
+		return "expected " + _as_str(actual) + " to contain " + _as_str(_val)
+
+static func contains(val):
+	return ContainsMatcher.new(val)
+
+
+# ---------------------------------------------------------------------------
+
+class Checker:
+	var _text
+	var _results
+
+	func _init(results, text):
+		_results = results
+		_text = text
+
+	func that(actual, matcher):
+		var res
+		var msg
+		if typeof(matcher) == TYPE_BOOLEAN:
+			res = matcher
+			msg = _text
+		else:
+			res = matcher.matches(actual)
+			msg = _text + ": " + matcher.describe(actual)
+		if ! res:
+			if _results != null:
+				_results.add_error(msg)
+			return false
+		return true
