@@ -345,7 +345,7 @@ class EmptyMatcher:
 	func describe(actual):
 		if _is_list(actual):
 			return "expected " + _as_str(actual) + " to be an empty list"
-		if typeof(expected) == TYPE_DICTIONARY:
+		if typeof(actual) == TYPE_DICTIONARY:
 			return "expected " + _as_str(actual) + " to be an empty dictionary"
 		return "expected " + _as_str(actual) + " to be an empty list or dictionary"
 
