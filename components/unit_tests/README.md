@@ -193,7 +193,7 @@ value = my_obj.perform(1)
 check_that("Did not compute correctly", value, is_not(null))
 ```
 
-### func `check(String::message)` : Checker
+### func `check(String::message = null)` : Checker
 
 For a more verbose style of testing, and for possible future extensibility,
 the `check(String)` method returns an object which allows for further
@@ -244,6 +244,14 @@ the expected value.
 check_that("should match", obj.get_value(), is(1))
 ```
 
+The "is" function can also be used as a wrapper around another matcher to make
+a more English-like sentence:
+
+```
+check().that(10.0 / 10.0, is(near(1.0)))
+```
+
+### static func `equals(Variant::expected_value)` : Matcher
 
 ### static func `is_not(Variant::expected_value)` : Matcher
 

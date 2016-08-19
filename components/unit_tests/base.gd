@@ -80,7 +80,7 @@ func check_that(text, actual, matcher):
 	return check_true(text + ": " + matcher.describe(actual), matcher.matches(actual))
 
 func check(text = ""):
-	return Checker.new(results, text)
+	return Checker.new(_results, text)
 
 
 
@@ -106,7 +106,7 @@ func run(result_collector):
 	var t
 	for t in _tests:
 		if has_method(t):
-			run_test(t, result_collector)
+			run_test(t)
 		else:
 			result_collector.add_error("Setup Error: requested function does not exist: " + t)
 
@@ -205,8 +205,17 @@ class IsMatcher:
 
 
 static func is(value):
+	# "is" can be used to make a clear English-like sentence.
+	# So, if the value is a matcher, then just use that matcher instead of
+	# adding another layer around "is".
+	if typeof(value) == TYPE_OBJECT && value.has_method("matches") && value.has_method("describe"):
+		return value
+	# Need to wrap the value in an is check.
 	return IsMatcher.new(value)
 
+
+static func equals(value):
+	return IsMatcher.new(value)
 
 
 class NotMatcher:
@@ -302,17 +311,17 @@ class ContainsMatcher:
 			if typeof(_val) == TYPE_VECTOR3:
 				return expected.has_point(_val)
 			return false
-		if typeof(actual) == TYPE_DICTIONARY:
+		if typeof(expected) == TYPE_DICTIONARY:
 			if _is_list(_val):
-				return actual.has_all(_val)
-		 	return actual.has(_val)
+				return expected.has_all(_val)
+		 	return expected.has(_val)
 
 
 		# These don't really make sense.
 
 		# Object values should just be checked for equality.
-		#if typeof(actual) == TYPE_OBJECT:
-		#	return actual.get(_val) != null
+		#if typeof(expected) == TYPE_OBJECT:
+		#	return expected.get(_val) != null
 
 		return false
 
@@ -336,7 +345,7 @@ class Checker:
 	func that(actual, matcher):
 		var res
 		var msg
-		if typeof(matcher) == TYPE_BOOLEAN:
+		if typeof(matcher) == TYPE_BOOL:
 			res = matcher
 			msg = _text
 		else:
