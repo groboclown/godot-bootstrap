@@ -307,6 +307,13 @@ The actual value may be one of these types:
 * `Plane` : checks whether the expected value (must be a `Vector3`) is on the
   plane.
 
+### static func `empty()` : Matcher
+
+Returns an `EmptyMatcher` instance that checks that the actual value is an
+empty list or dictionary.  If the type of the actual value isn't a list or
+dictionary, then this will fail.
+
+
 ## Test Suite Maintenance of Test Cases API
 
 These methods maintain the list of which test cases are actually run during the test.

@@ -231,7 +231,7 @@ class NotMatcher:
 		return ! val.matches(value)
 
 	func describe(value):
-		return "Expected not: " + val.describe(value)
+		return "expected not: " + val.describe(value)
 
 
 
@@ -286,42 +286,42 @@ class ContainsMatcher:
 	func _init(val):
 		_val = val
 
-	func matches(expected):
-		if expected == null:
+	func matches(actual):
+		if actual == null:
 			return false
-		if typeof(expected) == TYPE_STRING:
+		if typeof(actual) == TYPE_STRING:
 			# Expect a string to contain a sub-string
-			return expected.find(_val) >= 0
-		if _is_list(expected):
+			return actual.find(_val) >= 0
+		if _is_list(actual):
 			if _is_list(_val):
-				# each "val" must be in the expected list
+				# each "val" must be in the actual list
 				var v
 				for v in _val:
-					if ! (v in expected):
+					if ! (v in actual):
 						return false
 				return true
-			return _val in expected
-		if typeof(expected) == TYPE_RECT2:
+			return _val in actual
+		if typeof(actual) == TYPE_RECT2:
 			if typeof(_val) == TYPE_RECT2:
-				return expected.encloses(_val)
+				return actual.encloses(_val)
 			if typeof(_val) == TYPE_VECTOR2:
-				return expected.has_point(_val)
+				return actual.has_point(_val)
 			return false
-		if typeof(expected) == TYPE_PLANE:
+		if typeof(actual) == TYPE_PLANE:
 			if typeof(_val) == TYPE_VECTOR3:
-				return expected.has_point(_val)
+				return actual.has_point(_val)
 			return false
-		if typeof(expected) == TYPE_DICTIONARY:
+		if typeof(actual) == TYPE_DICTIONARY:
 			if _is_list(_val):
-				return expected.has_all(_val)
-		 	return expected.has(_val)
+				return actual.has_all(_val)
+		 	return actual.has(_val)
 
 
 		# These don't really make sense.
 
 		# Object values should just be checked for equality.
-		#if typeof(expected) == TYPE_OBJECT:
-		#	return expected.get(_val) != null
+		#if typeof(actual) == TYPE_OBJECT:
+		#	return actual.get(_val) != null
 
 		return false
 
@@ -330,6 +330,27 @@ class ContainsMatcher:
 
 static func contains(val):
 	return ContainsMatcher.new(val)
+
+
+class EmptyMatcher:
+	extends Matcher
+
+	func matches(actual):
+		if _is_list(actual):
+			return actual.size() <= 0
+		if typeof(actual) == TYPE_DICTIONARY:
+			return actual.keys().size() <= 0
+		return false
+
+	func describe(actual):
+		if _is_list(actual):
+			return "expected " + _as_str(actual) + " to be an empty list"
+		if typeof(expected) == TYPE_DICTIONARY:
+			return "expected " + _as_str(actual) + " to be an empty dictionary"
+		return "expected " + _as_str(actual) + " to be an empty list or dictionary"
+
+static func empty():
+	return EmptyMatcher.new()
 
 
 # ---------------------------------------------------------------------------
