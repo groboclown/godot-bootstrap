@@ -29,7 +29,7 @@ func find_tests_from_dir(path):
 			var f = File.new()
 			#print("Checking file " + name)
 			if name.right(name.length() - 3) == ".gd" && f.file_exists(name):
-				#print("added " + name)
+				# print("TEST ADDED " + name)
 				ret.append(name)
 		file_name = dir.get_next()
 	dir.list_dir_end()
@@ -105,8 +105,8 @@ class ResultCollector:
 			return
 		if current_suite["error_count"] <= 0:
 			print(suite_name + ": Success (" + str(current_suite["tests"].size()) + " tests)")
-			return
-		print(suite_name + ": Failed (" + str(current_suite["error_count"]) + " errors, " + str(current_suite["tests"].size()) + " tests)")
+		else:
+			print(suite_name + ": Failed (" + str(current_suite["error_count"]) + " errors, " + str(current_suite["tests"].size()) + " tests)")
 		suite_name = null
 		current_suite = null
 		current_test = null
