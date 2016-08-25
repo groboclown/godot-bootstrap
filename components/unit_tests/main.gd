@@ -103,10 +103,12 @@ class ResultCollector:
 	func end_suite():
 		if suite_name == null:
 			return
+		# Display a "- 1" on the test count, because otherwise this will include
+		# the <<class>> test, which we shouldn't count towards the total.
 		if current_suite["error_count"] <= 0:
-			print(suite_name + ": Success (" + str(current_suite["tests"].size()) + " tests)")
+			print(suite_name + ": Success (" + str(current_suite["tests"].size() - 1) + " tests)")
 		else:
-			print(suite_name + ": Failed (" + str(current_suite["error_count"]) + " errors, " + str(current_suite["tests"].size()) + " tests)")
+			print(suite_name + ": Failed (" + str(current_suite["error_count"]) + " errors, " + str(current_suite["tests"].size() - 1) + " tests)")
 		suite_name = null
 		current_suite = null
 		current_test = null
