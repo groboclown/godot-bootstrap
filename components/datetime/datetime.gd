@@ -108,7 +108,9 @@ static func _ord_to_date(ord):
 		"day": 0,
 		"month": 0,
 		"dst": false,
-		"weekday": ord % 7
+		# + 1 here because that's just how the calendar lines up once we're
+		# in the modern era.
+		"weekday": (ord + 1) % 7
 	}
 
 	var n400 = ord / _DAYS_IN_400Y
