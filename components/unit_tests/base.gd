@@ -149,9 +149,11 @@ class Matcher:
 class IsMatcher:
 	extends Matcher
 	var val
+	var _epsilon
 
-	func _init(v):
+	func _init(v, epsilon = 0.00001):
 		val = v
+		_epsilon = epsilon
 
 	func matches(value):
 		return _inner_match(val, value, [])
@@ -198,7 +200,7 @@ class IsMatcher:
 			return true
 		if typeof(v1) == TYPE_REAL:
 			# Closeness
-			return abs(float(v1) - v2) <= 0.0000001
+			return abs(float(v1) - v2) <= _epsilon
 		# Any other type should have == match right.
 		return false
 
@@ -207,14 +209,14 @@ class IsMatcher:
 
 
 
-static func is(value):
+static func is(value, epsilon = 0.00001):
 	# "is" can be used to make a clear English-like sentence.
 	# So, if the value is a matcher, then just use that matcher instead of
 	# adding another layer around "is".
 	if typeof(value) == TYPE_OBJECT && value.has_method("matches") && value.has_method("describe"):
 		return value
 	# Need to wrap the value in an is check.
-	return IsMatcher.new(value)
+	return IsMatcher.new(value, epsilon)
 
 
 static func equals(value):
