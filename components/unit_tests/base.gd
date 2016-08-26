@@ -196,6 +196,9 @@ class IsMatcher:
 				elif ! _inner_match(v1[k], v2[k], seen):
 					return false
 			return true
+		if typeof(v1) == TYPE_REAL:
+			# Closeness
+			return abs(float(v1) - v2) <= 0.0000001
 		# Any other type should have == match right.
 		return false
 
